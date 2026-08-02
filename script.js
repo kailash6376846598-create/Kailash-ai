@@ -14,7 +14,10 @@ async function sendMessage() {
     });
 
     const data = await res.json();
-    responseDiv.innerHTML = data.reply;
+
+    // अभी Debug के लिए पूरा Response दिखाएंगे
+    responseDiv.innerHTML = JSON.stringify(data, null, 2);
+
   } catch (err) {
     responseDiv.innerHTML = "Error: " + err.message;
   }
