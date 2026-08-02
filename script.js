@@ -2,6 +2,8 @@ async function sendMessage() {
   const prompt = document.getElementById("prompt").value;
   const responseDiv = document.getElementById("response");
 
+  if (prompt.trim() === "") return;
+
   responseDiv.innerHTML = "Thinking...";
 
   try {
@@ -15,8 +17,7 @@ async function sendMessage() {
 
     const data = await res.json();
 
-    // अभी Debug के लिए पूरा Response दिखाएंगे
-    responseDiv.innerHTML = JSON.stringify(data, null, 2);
+    responseDiv.innerHTML = data.reply;
 
   } catch (err) {
     responseDiv.innerHTML = "Error: " + err.message;
