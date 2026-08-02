@@ -1,8 +1,12 @@
+alert("Script Loaded");
+
 async function sendMessage() {
   const prompt = document.getElementById("prompt").value;
   const responseDiv = document.getElementById("response");
 
-  if (prompt.trim() === "") return;
+  if (prompt.trim() === "") {
+    return;
+  }
 
   responseDiv.innerHTML = "Thinking...";
 
