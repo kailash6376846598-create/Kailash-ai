@@ -1,28 +1,11 @@
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ reply: "Method not allowed" });
-  }
+  const apiKey = process.env.GEMINI_API_KEY;
 
-  try {
-    const { prompt } = req.body;
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+  );
 
-    const result = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
+  const data = await response.json();
 
-    return res.status(200).json({
-      reply: result.text,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      reply: error.message,
-    });
-  }
+  return res.status(200).json(data);
 }
