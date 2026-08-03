@@ -6,13 +6,10 @@ async function sendMessage() {
 
   if (prompt === "") return;
 
-  // User Message दिखाओ
   responseDiv.innerHTML += `<p><b>🧑 You:</b> ${prompt}</p>`;
 
-  // Input खाली करो
   promptInput.value = "";
 
-  // Thinking दिखाओ
   responseDiv.innerHTML += `<p id="thinking"><b>🤖 Kailash AI:</b> Thinking...</p>`;
 
   responseDiv.scrollTop = responseDiv.scrollHeight;
@@ -28,9 +25,11 @@ async function sendMessage() {
 
     const data = await res.json();
 
-    document.getElementById("thinking").remove();
+    const thinking = document.getElementById("thinking");
+    if (thinking) thinking.remove();
 
-    responseDiv.innerHTML += `<p><b>🤖 Kailash AI:</b> ${data.reply}</p>`;
+    // Debug: API क्या भेज रही है, यह दिखाएगा
+    responseDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
 
     responseDiv.scrollTop = responseDiv.scrollHeight;
 
