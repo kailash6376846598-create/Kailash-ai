@@ -64,3 +64,23 @@ button {
 button:hover {
   background: #1d4ed8;
 }
+.user-message{
+  background:#2563eb;
+  color:white;
+  padding:12px;
+  border-radius:18px 18px 4px 18px;
+  margin:10px 0;
+  text-align:right;
+  max-width:80%;
+  margin-left:auto;
+}
+
+.ai-message{
+  background:#334155;
+  color:white;
+  padding:12px;
+  border-radius:18px 18px 18px 4px;
+  margin:10px 0;
+  text-align:left;
+  max-width:80%;
+}
