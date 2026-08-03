@@ -28,7 +28,7 @@ async function sendMessage() {
     const thinking = document.getElementById("thinking");
     if (thinking) thinking.remove();
 
-    responseDiv.innerHTML += `<p><b>🤖 Kailash AI:</b> ${data.reply}</p>`;
+    responseDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
 
     responseDiv.scrollTop = responseDiv.scrollHeight;
 
