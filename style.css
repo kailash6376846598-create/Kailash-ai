@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  padding: 20px;
+  padding: 70px 20px 20px 20px;
   background: #0f172a;
   color: white;
   font-family: Arial, sans-serif;
@@ -8,6 +8,7 @@ body {
 
 h1 {
   text-align: center;
+  margin-bottom: 20px;
 }
 
 #response {
@@ -23,8 +24,8 @@ h1 {
 #prompt {
   width: 72%;
   padding: 12px;
-  border-radius: 8px;
   border: none;
+  border-radius: 8px;
   outline: none;
   font-size: 16px;
 }
