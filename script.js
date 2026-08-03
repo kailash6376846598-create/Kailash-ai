@@ -1,12 +1,10 @@
-alert("Script Loaded");
-
 async function sendMessage() {
-  const prompt = document.getElementById("prompt").value;
+  const promptInput = document.getElementById("prompt");
   const responseDiv = document.getElementById("response");
 
-  if (prompt.trim() === "") {
-    return;
-  }
+  const prompt = promptInput.value.trim();
+
+  if (prompt === "") return;
 
   responseDiv.innerHTML = "Thinking...";
 
@@ -23,7 +21,15 @@ async function sendMessage() {
 
     responseDiv.innerHTML = data.reply;
 
+    promptInput.value = "";
+
   } catch (err) {
     responseDiv.innerHTML = "Error: " + err.message;
   }
 }
+
+document.getElementById("prompt").addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+});
