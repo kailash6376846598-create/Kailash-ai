@@ -28,8 +28,7 @@ async function sendMessage() {
     const thinking = document.getElementById("thinking");
     if (thinking) thinking.remove();
 
-    // Debug: API क्या भेज रही है, यह दिखाएगा
-    responseDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+    responseDiv.innerHTML += `<p><b>🤖 Kailash AI:</b> ${data.reply}</p>`;
 
     responseDiv.scrollTop = responseDiv.scrollHeight;
 
