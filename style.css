@@ -1,34 +1,36 @@
 body {
   font-family: Arial, sans-serif;
-  background: #121212;
+  background: #0f172a;
   color: white;
+  max-width: 700px;
+  margin: 40px auto;
   padding: 20px;
 }
 
-#chatBox {
-  height: 400px;
-  overflow-y: auto;
-  border: 1px solid #444;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-}
-
-.user {
-  color: #00ff99;
-  margin: 10px 0;
-}
-
-.ai {
-  color: #ffffff;
-  margin: 10px 0;
+h1 {
+  text-align: center;
 }
 
 input {
   width: 75%;
-  padding: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+#response {
+  margin-top: 20px;
+  padding: 15px;
+  background: #1e293b;
+  border-radius: 10px;
+  white-space: pre-wrap;
 }
