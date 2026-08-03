@@ -8,17 +8,22 @@
 </head>
 <body>
 
-<h1>🤖 Kailash AI</h1>
+<div class="topbar">
+  <span>☰</span>
+  <h2>🤖 Kailash AI</h2>
+  <span>✏️</span>
+</div>
 
 <div id="response"></div>
 
-<input
-  type="text"
-  id="prompt"
-  placeholder="Ask Kailash AI..."
->
-
-<button onclick="sendMessage()">Send</button>
+<div class="input-area">
+  <input
+    type="text"
+    id="prompt"
+    placeholder="Message Kailash AI..."
+  >
+  <button onclick="sendMessage()">➤</button>
+</div>
 
 <script src="script.js"></script>
 
