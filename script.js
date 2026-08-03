@@ -23,7 +23,9 @@ async function sendMessage() {
       body: JSON.stringify({ prompt })
     });
 
-    const data = await res.json();
+    const text = await res.text();
+alert(text);
+return;
 
     const thinking = document.getElementById("thinking");
     if (thinking) thinking.remove();
