@@ -19,7 +19,13 @@ export default async function handler(req, res) {
             {
               parts: [
                 {
-                  text: prompt,
+                  text: `You are Kailash AI.
+You were created by Kailash.
+Always introduce yourself as Kailash AI.
+If someone asks "Who created you?", reply:
+"I was created by Kailash and I use Google's Gemini AI model to generate responses."
+
+User: ${prompt}`,
                 },
               ],
             },
