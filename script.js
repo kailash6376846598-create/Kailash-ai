@@ -6,7 +6,16 @@ async function sendMessage() {
 
   if (prompt === "") return;
 
-  responseDiv.innerHTML = "Thinking...";
+  // User Message दिखाओ
+  responseDiv.innerHTML += `<p><b>🧑 You:</b> ${prompt}</p>`;
+
+  // Input खाली करो
+  promptInput.value = "";
+
+  // Thinking दिखाओ
+  responseDiv.innerHTML += `<p id="thinking"><b>🤖 Kailash AI:</b> Thinking...</p>`;
+
+  responseDiv.scrollTop = responseDiv.scrollHeight;
 
   try {
     const res = await fetch("/api/chat", {
@@ -19,12 +28,17 @@ async function sendMessage() {
 
     const data = await res.json();
 
-    responseDiv.innerHTML = data.reply;
+    document.getElementById("thinking").remove();
 
-    promptInput.value = "";
+    responseDiv.innerHTML += `<p><b>🤖 Kailash AI:</b> ${data.reply}</p>`;
+
+    responseDiv.scrollTop = responseDiv.scrollHeight;
 
   } catch (err) {
-    responseDiv.innerHTML = "Error: " + err.message;
+    const thinking = document.getElementById("thinking");
+    if (thinking) thinking.remove();
+
+    responseDiv.innerHTML += `<p><b>❌ Error:</b> ${err.message}</p>`;
   }
 }
 
