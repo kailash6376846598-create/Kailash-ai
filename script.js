@@ -41,7 +41,7 @@ document.getElementById("thinking")?.remove();
 
     responseDiv.innerHTML += `<p><b>🤖 Kailash AI:</b> ${data.reply}</p>`;
     responseDiv.scrollTop = responseDiv.scrollHeight;
-
+saveChat();
   } catch (err) {
     document.getElementById("thinking")?.remove();
 
