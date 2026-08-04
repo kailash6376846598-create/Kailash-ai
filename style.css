@@ -83,4 +83,14 @@ button:hover {
   margin:10px 0;
   text-align:left;
   max-width:80%;
+}.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+
+.user-message,
+.ai-message {
+  word-wrap: break-word;
 }
