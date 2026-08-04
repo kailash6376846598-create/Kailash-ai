@@ -13,7 +13,8 @@ function loadChat() {
   }
 }
 
-window.onload = loadChat;async function sendMessage() {
+window.onload = loadChat;async
+  function sendMessage() {
   const promptInput = document.getElementById("prompt");
   const responseDiv = document.getElementById("response");
 
