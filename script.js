@@ -1,5 +1,4 @@
-async function sendMessage() {
-  const promptInput = document.getElementById("prompt");
+const promptInput = document.getElementById("prompt");
   const responseDiv = document.getElementById("response");
 
   const prompt = promptInput.value.trim();
