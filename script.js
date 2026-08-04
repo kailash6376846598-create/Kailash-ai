@@ -32,11 +32,7 @@ return;
 
     responseDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
 
-    responseDiv.scrollTop = responseDiv.scrollHeight;
-
-  } catch (err) {
-    const thinking = document.getElementById("thinking");
-    if (thinking) thinking.remove();
+    responseDiv.scrollTop = responseDiv
 
     responseDiv.innerHTML += `<p><b>❌ Error:</b> ${err.message}</p>`;
   }
