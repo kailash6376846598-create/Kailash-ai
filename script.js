@@ -1,4 +1,19 @@
-async function sendMessage() {
+function saveChat() {
+  const responseDiv = document.getElementById("response");
+  localStorage.setItem("kailash_chat", responseDiv.innerHTML);
+}
+
+function loadChat() {
+  const responseDiv = document.getElementById("response");
+  const savedChat = localStorage.getItem("kailash_chat");
+
+  if (savedChat) {
+    responseDiv.innerHTML = savedChat;
+    responseDiv.scrollTop = responseDiv.scrollHeight;
+  }
+}
+
+window.onload = loadChat;async function sendMessage() {
   const promptInput = document.getElementById("prompt");
   const responseDiv = document.getElementById("response");
 
