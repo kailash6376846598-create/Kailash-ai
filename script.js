@@ -1,5 +1,4 @@
-const promptInput = document.getElementById("prompt");
-  const responseDiv = document.getElementById("response");
+const responseDiv = document.getElementById("response");
 
   const prompt = promptInput.value.trim();
 
