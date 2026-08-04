@@ -23,7 +23,7 @@ async function sendMessage() {
 
   if (prompt === "") return;
 
-  responseDiv.innerHTML += `<p><b>🧑 You:</b> ${prompt}</p>`;
+  responseDiv.innerHTML += `<div class="user-message">${prompt}</div>`;
   promptInput.value = "";
 
   responseDiv.innerHTML += `<p id="thinking"><b>🤖 Kailash AI:</b> Thinking...</p>`;
