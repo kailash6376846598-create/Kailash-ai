@@ -20,7 +20,9 @@ async function sendMessage() {
       body: JSON.stringify({ prompt })
     });
 
-    const data = await res.json();    document.getElementById("thinking")?.remove();
+    const data = await res.json();
+
+document.getElementById("thinking")?.remove();
 
     responseDiv.innerHTML += `<p><b>🤖 Kailash AI:</b> ${data.reply}</p>`;
     responseDiv.scrollTop = responseDiv.scrollHeight;
