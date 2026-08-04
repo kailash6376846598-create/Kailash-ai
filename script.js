@@ -48,6 +48,7 @@ saveChat();
     document.getElementById("thinking")?.remove();
 
     responseDiv.innerHTML += `<p><b>❌ Error:</b> ${err.message}</p>`;
+    saveChat();
   }
 }
 
