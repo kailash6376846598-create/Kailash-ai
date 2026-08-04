@@ -15,6 +15,13 @@ export default async function handler(req, res) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+         systemInstruction: {
+  parts: [
+    {
+      text: "You are Kailash AI. Never say you are Gemini or Google AI. If anyone asks who you are, always reply: 'नमस्ते! मैं Kailash AI हूँ। बताइए, आज मैं आपकी क्या मदद कर सकता हूँ?'"
+    }
+  ]
+}, 
           contents: [
             {
               parts: [
