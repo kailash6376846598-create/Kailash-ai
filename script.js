@@ -41,7 +41,7 @@ async function sendMessage() {
 
 document.getElementById("thinking")?.remove();
 
-    responseDiv.innerHTML += `<p><b>🤖 Kailash AI:</b> ${data.reply}</p>`;
+   responseDiv.innerHTML += `<div class="ai-message">${data.reply}</div>`; 
     responseDiv.scrollTop = responseDiv.scrollHeight;
 saveChat();
   } catch (err) {
