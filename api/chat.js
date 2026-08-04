@@ -33,10 +33,8 @@ export default async function handler(req, res) {
 if (!response.ok) {
   return res.status(response.status).json(data);
 }
-      return res.status(response.status).json(data);
-    }
 
-    const reply =
+const reply =
       data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
 
     return res.status(200).json({ reply });
