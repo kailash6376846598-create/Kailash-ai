@@ -26,10 +26,7 @@ export default async function handler(req, res) {
             {
               parts: [
                 {
-                  text: `Previous conversation:
-${history}
-
-User: ${prompt}`
+                  text: prompt
                 }
               ]
             }
