@@ -22,6 +22,11 @@ async function sendMessage() {
   const responseDiv = document.getElementById("response");
 
   const prompt = promptInput.value.trim();
+  
+  chatHistory.push({
+  role: "user",
+  text: prompt
+});
 
   if (prompt === "") return;
 
