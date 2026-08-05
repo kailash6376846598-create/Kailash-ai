@@ -35,8 +35,8 @@ async function sendMessage() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-  prompt,
-  history: responseDiv.innerText
+  prompt
+})
 })
     });
 
