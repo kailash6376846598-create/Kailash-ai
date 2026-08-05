@@ -34,7 +34,10 @@ async function sendMessage() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify({
+  prompt,
+  history: responseDiv.innerText
+})
     });
 
     const data = await res.json();
