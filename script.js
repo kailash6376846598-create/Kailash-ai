@@ -33,7 +33,7 @@ async function sendMessage() {
   responseDiv.innerHTML += `<div class="user-message">${prompt}</div>`;
   promptInput.value = "";
 
-  responseDiv.innerHTML += `<p id="thinking"><b>🤖 Kailash AI:</b> Thinking...</p>`;
+  responseDiv.innerHTML += `<
 
   try {
     const res = await fetch("/api/chat", {
@@ -43,9 +43,13 @@ async function sendMessage() {
       },
       body: JSON.stringify({
   prompt,
-  chatHistory
-})
-    });
+  responseDiv.innerHTML += `
+<div id="thinking" class="ai-message thinking">
+  <span>🤖 Kailash AI</span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+</div>`;
 
     const data = await res.json();
 
