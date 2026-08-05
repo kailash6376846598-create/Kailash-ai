@@ -99,7 +99,7 @@ button {
   scroll-behavior:smooth;
 }
 
-.user-message,.thinking {
+.thinking {
   display: flex;
   align-items: center;
   gap: 6px;
