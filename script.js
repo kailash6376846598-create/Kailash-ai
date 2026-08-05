@@ -1,3 +1,5 @@
+let chatHistory = [];
+
 function saveChat() {
   const responseDiv = document.getElementById("response");
   localStorage.setItem("kailash_chat", responseDiv.innerHTML);
