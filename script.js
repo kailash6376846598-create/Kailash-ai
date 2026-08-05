@@ -51,6 +51,11 @@ async function sendMessage() {
 document.getElementById("thinking")?.remove();
 
    responseDiv.innerHTML += `<div class="ai-message">${data.reply}</div>`; 
+    
+    chatHistory.push({
+  role: "assistant",
+  text: data.reply
+});
     responseDiv.scrollTop = responseDiv.scrollHeight;
 saveChat();
   } catch (err) {
