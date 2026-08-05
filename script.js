@@ -37,7 +37,6 @@ async function sendMessage() {
       body: JSON.stringify({
   prompt
 })
-})
     });
 
     const data = await res.json();
