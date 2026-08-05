@@ -23,14 +23,21 @@ export default async function handler(req, res) {
   ]
 }, 
           contents: [
-            {
-              parts: [
-                {
-                  text: prompt
-                }
-              ]
-            }
-          ]
+  ...chatHistory.map(message => ({
+    parts: [
+      {
+        text: message.text
+      }
+    ]
+  })),
+  {
+    parts: [
+      {
+        text: prompt
+      }
+    ]
+  }
+]
         })
       }
     );
