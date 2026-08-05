@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  padding: 70px 20px 20px 20px;
+  padding: 70px 20px 20px;
   background: #0f172a;
   color: white;
   font-family: Arial, sans-serif;
@@ -25,7 +25,7 @@ body {
   margin: 0;
   font-size: 20px;
 }
-25
+
 #response {
   height: 65vh;
   overflow-y: auto;
@@ -57,61 +57,53 @@ button {
   border-radius: 10px;
   background: #2563eb;
   color: white;
-  font-size: 16px;background: #1d4ed8;
-}
-.user-message{
-  background:#2563eb;
-  color:white;
-  padding:12px;
-  border-radius:18px 18px 4px 18px;
-  margin:10px 0;
-  text-align:right;
-  max-width:80%;
-  margin-left:auto;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-.ai-message{
-  .user-message{
-  background:#2563eb;
-  color:white;
-  padding:12px;
-  border-radius:18px 18px 4px 18px;
-  margin:10px 0;
-  text-align:right;
-  max-width:80%;
-  margin-left:auto;
+button:hover {
+  background: #1d4ed8;
+}.user-message {
+  background: #2563eb;
+  color: white;
+  padding: 12px;
+  border-radius: 18px 18px 4px 18px;
+  margin: 10px 0;
+  text-align: right;
+  max-width: 80%;
+  margin-left: auto;
+  word-wrap: break-word;
 }
 
-.ai-message{
-  background:#334155;
-  color:white;
-  padding:12px;
-  border-radius:18px 18px 18px 4px;
-  margin:10px 0;
-  text-align:left;
-  max-width:80%;
+.ai-message {
+  background: #334155;
+  color: white;
+  padding: 12px;
+  border-radius: 18px 18px 18px 4px;
+  margin: 10px 0;
+  text-align: left;
+  max-width: 80%;
+  word-wrap: break-word;
 }
 
-.chat-container{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  scroll-behavior:smooth;
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .thinking {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #cbd5e1;
-  font-style: italic;
 }
 
 .dot {
+  display: inline-block;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
   background: white;
+  border-radius: 50%;
   animation: blink 1.4s infinite;
 }
 
@@ -130,7 +122,4 @@ button {
   40% {
     opacity: 1;
   }
-}
-.ai-message{
-  word-wrap:break-word;
 }
