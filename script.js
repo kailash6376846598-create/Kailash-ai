@@ -49,6 +49,8 @@ async function sendMessage() {
       },
       body: JSON.stringify({
   prompt,
+  chatHistory
+})
   responseDiv.innerHTML += `
 <div id="thinking" class="ai-message thinking">
   <span>🤖 Kailash AI</span>
