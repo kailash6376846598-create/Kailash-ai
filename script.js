@@ -139,3 +139,9 @@ removeImageBtn.addEventListener("click", () => {
   document.getElementById("imagePreview").innerHTML = "";
   removeImageBtn.hidden = true;
 });
+const pdfBtn = document.getElementById("pdfBtn");
+const pdfInput = document.getElementById("pdfInput");
+
+pdfBtn.addEventListener("click", () => {
+  pdfInput.click();
+});
