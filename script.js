@@ -117,3 +117,13 @@ const imageBtn = document.getElementById("imageBtn");
 imageBtn.addEventListener("click", () => {
   document.getElementById("imageInput").click();
 });
+imageInput.addEventListener("change", () => {
+  const preview = document.getElementById("imagePreview");
+
+  if (imageInput.files.length > 0) {
+    const file = imageInput.files[0];
+    preview.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Preview">`;
+  } else {
+    preview.innerHTML = "";
+  }
+});
