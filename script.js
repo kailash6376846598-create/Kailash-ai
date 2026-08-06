@@ -24,6 +24,15 @@ const responseDiv = document.getElementById("response");
 
   const prompt = promptInput.value.trim();
   const image = imageInput.files[0];
+  let imageBase64 = "";
+
+if (image) {
+  imageBase64 = await new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(image);
+  });
+}
   
   chatHistory.push({
   role: "user",
