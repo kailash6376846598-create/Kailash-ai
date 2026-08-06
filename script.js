@@ -127,3 +127,10 @@ imageInput.addEventListener("change", () => {
     preview.innerHTML = "";
   }
 });
+const removeImageBtn = document.getElementById("removeImageBtn");
+
+removeImageBtn.addEventListener("click", () => {
+  imageInput.value = "";
+  document.getElementById("imagePreview").innerHTML = "";
+  removeImageBtn.hidden = true;
+});
