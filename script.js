@@ -50,9 +50,10 @@ const responseDiv = document.getElementById("response");
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    prompt,
-    chatHistory
-  })
+  prompt,
+  chatHistory,
+  hasImage: !!image
+})
 });
 
 const data = await res.json();
