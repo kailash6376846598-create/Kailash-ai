@@ -34,7 +34,15 @@ export default async function handler(req, res) {
     parts: [
       {
         text: prompt
-      }
+      },
+      ...(hasImage
+        ? [{
+            inlineData: {
+              mimeType: "image/jpeg",
+              data: imageBase64.split(",")[1]
+            }
+          }]
+        : [])
     ]
   }
 ]
