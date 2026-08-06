@@ -123,7 +123,8 @@ imageInput.addEventListener("change", () => {
   if (imageInput.files.length > 0) {
     const file = imageInput.files[0];
     preview.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Preview">`;
-  } else {
+    removeImageBtn.hidden = false;
+} else {
     preview.innerHTML = "";
   }
 });
