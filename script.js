@@ -24,7 +24,6 @@ window.onload = loadChat;
 
 async function sendMessage() {
   const promptInput = document.getElementById("prompt");
-const imageInput = document.getElementById("imageInput");
 const responseDiv = document.getElementById("response");
 
   const prompt = promptInput.value.trim();
