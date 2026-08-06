@@ -22,6 +22,11 @@ function loadChat() {
 
 window.onload = loadChat;
 
+const imageInput = document.getElementById("imageInput");
+const imageBtn = document.getElementById("imageBtn");
+const removeImageBtn = document.getElementById("removeImageBtn");
+const pdfBtn = document.getElementById("pdfBtn");
+const pdfInput = document.getElementById("pdfInput");
 async function sendMessage() {
   const promptInput = document.getElementById("prompt");
 const responseDiv = document.getElementById("response");
