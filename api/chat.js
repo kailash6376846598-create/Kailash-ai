@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ reply: "Method not allowed" });
   }
 
-  const { prompt, chatHistory, imageBase64, hasImage } = req.body;
+  const { prompt, chatHistory, imageBase64, hasImage, pdfText } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
 
   try {
