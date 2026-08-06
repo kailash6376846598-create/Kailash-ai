@@ -33,7 +33,9 @@ export default async function handler(req, res) {
   {
     parts: [
       {
-        text: prompt
+        text: pdfText
+  ? `PDF Content:\n${pdfText}\n\nUser Question: ${prompt}`
+  : prompt
       },
       ...(hasImage
         ? [{
