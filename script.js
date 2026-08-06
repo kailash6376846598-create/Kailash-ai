@@ -78,3 +78,24 @@ document.getElementById("prompt").addEventListener("keydown", function(event) {
     sendMessage();
   }
 });
+const micBtn = document.getElementById("micBtn");
+
+if ("webkitSpeechRecognition" in window) {
+  const recognition = new webkitSpeechRecognition();
+
+  recognition.lang = "hi-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  micBtn.addEventListener("click", () => {
+    recognition.start();
+  });
+
+  recognition.onresult = (event) => {
+    document.getElementById("prompt").value =
+      event.results[0][0].transcript;
+  };
+} else {
+  micBtn.disabled = true;
+  micBtn.innerText = "❌";
+}
