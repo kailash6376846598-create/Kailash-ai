@@ -23,6 +23,7 @@ const imageInput = document.getElementById("imageInput");
 const responseDiv = document.getElementById("response");
 
   const prompt = promptInput.value.trim();
+  const image = imageInput.files[0];
   
   chatHistory.push({
   role: "user",
