@@ -63,7 +63,8 @@ if (image) {
   prompt,
   chatHistory,
   hasImage: !!image,
-  imageBase64
+  imageBase64,
+  pdfText
 })
 });
 
