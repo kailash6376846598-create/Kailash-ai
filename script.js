@@ -51,13 +51,6 @@ async function sendMessage() {
   prompt,
   chatHistory
 })
-  responseDiv.innerHTML += `
-<div id="thinking" class="ai-message thinking">
-  <span>🤖 Kailash AI</span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-</div>`;
 
     const data = await res.json();
 
