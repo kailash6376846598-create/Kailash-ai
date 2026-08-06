@@ -112,3 +112,8 @@ if ("webkitSpeechRecognition" in window) {
   micBtn.disabled = true;
   micBtn.innerText = "❌";
 }
+const imageBtn = document.getElementById("imageBtn");
+
+imageBtn.addEventListener("click", () => {
+  document.getElementById("imageInput").click();
+});
