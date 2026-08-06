@@ -72,6 +72,9 @@ document.getElementById("thinking")?.remove();
 
    responseDiv.innerHTML += `<div class="ai-message">${data.reply}</div>`; 
     
+    const speech = new SpeechSynthesisUtterance(data.reply);
+speech.lang = "hi-IN";
+speechSynthesis.speak(speech);
     chatHistory.push({
   role: "assistant",
   text: data.reply
