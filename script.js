@@ -82,7 +82,15 @@ speech.lang = "hi-IN";
 speechSynthesis.speak(speech);
     chatHistory.push({
   role: "assistant",
-  text: data.reply
+  text: data.replyconst newChatBtn = document.querySelector(".topbar span:last-child");
+
+newChatBtn.addEventListener("click", () => {
+  if (confirm("नई चैट शुरू करनी है?")) {
+    chatHistory = [];
+    localStorage.removeItem("kailash_chat");
+    document.getElementById("response").innerHTML = "";
+  }
+});
 });
     responseDiv.scrollTop = responseDiv.scrollHeight;
 saveChat();
