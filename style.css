@@ -123,3 +123,14 @@ button:hover {
     opacity: 1;
   }
 }
+#imagePreview {
+  margin: 10px 0;
+}
+
+#imagePreview img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #334155;
+}
