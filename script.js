@@ -145,3 +145,12 @@ const pdfInput = document.getElementById("pdfInput");
 pdfBtn.addEventListener("click", () => {
   pdfInput.click();
 });
+pdfInput.addEventListener("change", () => {
+  const preview = document.getElementById("pdfPreview");
+
+  if (pdfInput.files.length > 0) {
+    preview.innerHTML = `📄 ${pdfInput.files[0].name}`;
+  } else {
+    preview.innerHTML = "";
+  }
+});
