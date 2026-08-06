@@ -154,10 +154,13 @@ pdfInput.addEventListener("change", async () => {
   if (pdfInput.files.length > 0) {
     const file = pdfInput.files[0];
 
-    preview.innerHTML = `📄 ${file.name}`;
+preview.innerHTML = `📄 ${file.name}`;
 
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+const arrayBuffer = await file.arrayBuffer();
+alert("PDF Loaded");
+
+const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+alert("PDF Opened");
 
     pdfText = "";
 
