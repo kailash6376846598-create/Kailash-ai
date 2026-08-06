@@ -1,4 +1,5 @@
 let chatHistory = [];
+let pdfText = "";
 
 function saveChat() {
   const responseDiv = document.getElementById("response");
@@ -145,12 +146,28 @@ const pdfInput = document.getElementById("pdfInput");
 pdfBtn.addEventListener("click", () => {
   pdfInput.click();
 });
-pdfInput.addEventListener("change", () => {
+
+pdfInput.addEventListener("change", async () => {
   const preview = document.getElementById("pdfPreview");
 
   if (pdfInput.files.length > 0) {
-    preview.innerHTML = `📄 ${pdfInput.files[0].name}`;
+    const file = pdfInput.files[0];
+
+    preview.innerHTML = `📄 ${file.name}`;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    pdfText = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const text = await page.getTextContent();
+
+      pdfText += text.items.map(item => item.str).join(" ") + "\n";
+    }
   } else {
     preview.innerHTML = "";
+    pdfText = "";
   }
 });
