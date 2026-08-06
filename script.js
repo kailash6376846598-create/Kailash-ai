@@ -126,6 +126,7 @@ imageInput.addEventListener("change", () => {
     removeImageBtn.hidden = false;
 } else {
     preview.innerHTML = "";
+    removeImageBtn.hidden = true;
   }
 });
 const removeImageBtn = document.getElementById("removeImageBtn");
