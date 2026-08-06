@@ -61,7 +61,8 @@ if (image) {
   body: JSON.stringify({
   prompt,
   chatHistory,
-  hasImage: !!image
+  hasImage: !!image,
+  imageBase64
 })
 });
 
