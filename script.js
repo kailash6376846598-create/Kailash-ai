@@ -43,16 +43,17 @@ async function sendMessage() {
 
   try {
     const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-  prompt,
-  chatHistory
-})
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    prompt,
+    chatHistory
+  })
+});
 
-    const data = await res.json();
+const data = await res.json();
 
 document.getElementById("thinking")?.remove();
 
