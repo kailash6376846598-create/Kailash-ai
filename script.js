@@ -150,3 +150,53 @@ removeImageBtn.addEventListener("click", () => {
   document.getElementById("imagePreview").innerHTML = "";
   removeImageBtn.hidden = true;
 });
+// 📄 PDF Upload
+pdfBtn.addEventListener("click", () => {
+  pdfInput.click();
+});
+
+pdfInput.addEventListener("change", async () => {
+  const preview = document.getElementById("pdfPreview");
+
+  if (pdfInput.files.length === 0) {
+    preview.innerHTML = "";
+    pdfText = "";
+    return;
+  }
+
+  const file = pdfInput.files[0];
+  preview.innerHTML = `📄 ${file.name}`;
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    pdfText = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const text = await page.getTextContent();
+
+      pdfText += text.items.map(item => item.str).join(" ") + "\n";
+    }
+  } catch (err) {
+    alert("PDF Read Error: " + err.message);
+  }
+});
+
+// ✏️ New Chat
+const newChatBtn = document.querySelector(".topbar span:last-child");
+
+newChatBtn.addEventListener("click", () => {
+  if (confirm("नई चैट शुरू करनी है?")) {
+    chatHistory = [];
+    pdfText = "";
+    localStorage.removeItem("kailash_chat");
+    responseDiv.innerHTML = "";
+    document.getElementById("imagePreview").innerHTML = "";
+    document.getElementById("pdfPreview").innerHTML = "";
+    imageInput.value = "";
+    pdfInput.value = "";
+    removeImageBtn.hidden = true;
+  }
+});
