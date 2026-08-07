@@ -178,3 +178,6 @@ button:hover {
 .menu button {
   width: 180px;
 }
+.menu[hidden] {
+  display: none !important;
+}
