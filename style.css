@@ -141,3 +141,24 @@ button:hover {
   border-radius: 10px;
   color: white;
 }
+#response::-webkit-scrollbar {
+  width: 6px;
+}
+
+#response::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 10px;
+}
+
+#response::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#prompt {
+  background: #1e293b;
+  color: white;
+}
+
+#prompt::placeholder {
+  color: #94a3b8;
+}
