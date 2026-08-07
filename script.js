@@ -210,3 +210,15 @@ aboutBtn.addEventListener("click", () => {
   alert("🤖 Kailash AI\n\nVersion: V1.0\nDeveloper: Kailash");
   menu.hidden = true;
 });
+const newChatMenuBtn = document.getElementById("newChatMenuBtn");
+newChatMenuBtn.addEventListener("click", () => {
+  if (confirm("नई चैट शुरू करनी है?")) {
+    chatHistory = [];
+    localStorage.removeItem("kailash_chat");
+
+    responseDiv.innerHTML = "";
+    promptInput.value = "";
+
+    menu.hidden = true;
+  }
+});
