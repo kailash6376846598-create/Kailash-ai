@@ -157,8 +157,6 @@ pdfBtn.addEventListener("click", () => {
 });
 
 pdfInput.addEventListener("change", async () => {
-
-pdfInput.addEventListener("change", async () => {
   const preview = document.getElementById("pdfPreview");
 
   if (pdfInput.files.length === 0) {
