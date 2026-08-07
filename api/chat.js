@@ -85,11 +85,12 @@ console.log("Google Response:", data);
     const reply =
       data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
 
-    return res.status(200).json({ reply });  } catch (error) {
-    console.error(error);
+    return res.status(200).json({ reply });  } 
+  
+       catch (error) {
+  console.error("ERROR:", error);
 
-    return res.status(500).json({
-      reply: error.message
-    });
-  }
-                }
+  return res.status(500).json({
+    reply: error.message
+  });
+}          }
