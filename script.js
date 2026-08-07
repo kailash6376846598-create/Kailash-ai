@@ -13,9 +13,6 @@ const imageInput = document.getElementById("imageInput");
 const imageBtn = document.getElementById("imageBtn");
 const removeImageBtn = document.getElementById("removeImageBtn");
 
-const pdfInput = document.getElementById("pdfInput");
-const pdfBtn = document.getElementById("pdfBtn");
-
 const micBtn = document.getElementById("micBtn");
 
 function saveChat() {
@@ -149,10 +146,6 @@ removeImageBtn.addEventListener("click", () => {
   imageInput.value = "";
   document.getElementById("imagePreview").innerHTML = "";
   removeImageBtn.hidden = true;
-});
-// 📄 PDF Upload
-pdfBtn.addEventListener("click", () => {
-  pdfInput.click();
 });
 
 pdfInput.addEventListener("change", async () => {
