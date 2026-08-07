@@ -244,3 +244,15 @@ themeBtn.addEventListener("click", () => {
 
   menu.hidden = true;
 });
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsPanel = document.getElementById("settingsPanel");
+const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+
+settingsBtn.addEventListener("click", () => {
+  settingsPanel.hidden = false;
+  menu.hidden = true;
+});
+
+closeSettingsBtn.addEventListener("click", () => {
+  settingsPanel.hidden = true;
+});
