@@ -51,9 +51,13 @@ async function sendMessage() {
   promptInput.value = "";
 
   responseDiv.innerHTML += `
-    <div id="thinking" class="ai-message">
-      🤖 Kailash AI is thinking...
-    </div>
+<div id="thinking" class="ai-message thinking">
+  <span>🤖 Kailash AI</span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+</div>
+`;
   `;
 
   try {
