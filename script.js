@@ -102,3 +102,51 @@ async function sendMessage() {
     responseDiv.innerHTML += `<div class="ai-message">❌ ${err.message}</div>`;
   }
 }
+document.getElementById("prompt").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
+});
+
+// 🎤 Voice Input
+if ("webkitSpeechRecognition" in window) {
+  const recognition = new webkitSpeechRecognition();
+
+  recognition.lang = "hi-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  micBtn.addEventListener("click", () => {
+    recognition.start();
+  });
+
+  recognition.onresult = (event) => {
+    promptInput.value = event.results[0][0].transcript;
+  };
+} else {
+  micBtn.disabled = true;
+}
+
+// 📎 Image Upload
+imageBtn.addEventListener("click", () => {
+  imageInput.click();
+});
+
+imageInput.addEventListener("change", () => {
+  const preview = document.getElementById("imagePreview");
+
+  if (imageInput.files.length > 0) {
+    const file = imageInput.files[0];
+    preview.innerHTML = `<img src="${URL.createObjectURL(file)}" style="max-width:120px;border-radius:10px;">`;
+    removeImageBtn.hidden = false;
+  } else {
+    preview.innerHTML = "";
+    removeImageBtn.hidden = true;
+  }
+});
+
+removeImageBtn.addEventListener("click", () => {
+  imageInput.value = "";
+  document.getElementById("imagePreview").innerHTML = "";
+  removeImageBtn.hidden = true;
+});
