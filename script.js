@@ -210,3 +210,11 @@ aboutBtn.addEventListener("click", () => {
   alert("🤖 Kailash AI\n\nVersion: V1.0\nDeveloper: Kailash");
   menu.hidden = true;
 });
+document.addEventListener("click", (e) => {
+  if (
+    !menu.contains(e.target) &&
+    e.target !== menuBtn
+  ) {
+    menu.hidden = true;
+  }
+});
