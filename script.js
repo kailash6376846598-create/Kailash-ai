@@ -146,6 +146,10 @@ imageInput.addEventListener("change", () => {
 });
 
 removeImageBtn.addEventListener("click", () => {
+  // 📄 PDF Button
+pdfBtn.addEventListener("click", () => {
+  pdfInput.click();
+});
   imageInput.value = "";
   document.getElementById("imagePreview").innerHTML = "";
   removeImageBtn.hidden = true;
