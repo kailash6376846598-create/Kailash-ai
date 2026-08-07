@@ -216,3 +216,27 @@ body.light-mode #prompt {
 body.light-mode .menu {
   background: white;
 }
+#settingsPanel {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 350px;
+  background: #1e293b;
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  z-index: 1001;
+}
+
+body.light-mode #settingsPanel {
+  background: white;
+  color: black;
+}
+
+#settingsPanel button {
+  width: 100%;
+  margin-top: 15px;
+}
