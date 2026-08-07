@@ -181,3 +181,38 @@ button:hover {
 .menu[hidden] {
   display: none !important;
 }
+/* Light Mode */
+body.light-mode {
+  background: #f8fafc;
+  color: #111827;
+}
+
+body.light-mode .topbar {
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+
+body.light-mode #response {
+  background: #ffffff;
+  color: #111827;
+}
+
+body.light-mode .ai-message {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+body.light-mode .user-message {
+  background: #2563eb;
+  color: white;
+}
+
+body.light-mode #prompt {
+  background: white;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+body.light-mode .menu {
+  background: white;
+}
