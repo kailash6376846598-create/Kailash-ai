@@ -193,3 +193,20 @@ newChatBtn.addEventListener("click", () => {
     removeImageBtn.hidden = true;
   }
 });
+const menuBtn = document.getElementById("menuBtn");
+const menu = document.getElementById("menu");
+const closeMenuBtn = document.getElementById("closeMenuBtn");
+const aboutBtn = document.getElementById("aboutBtn");
+
+menuBtn.addEventListener("click", () => {
+  menu.hidden = false;
+});
+
+closeMenuBtn.addEventListener("click", () => {
+  menu.hidden = true;
+});
+
+aboutBtn.addEventListener("click", () => {
+  alert("🤖 Kailash AI\n\nVersion: V1.0\nDeveloper: Kailash");
+  menu.hidden = true;
+});
