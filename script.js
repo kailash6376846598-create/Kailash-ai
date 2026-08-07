@@ -58,7 +58,6 @@ async function sendMessage() {
   <span class="dot"></span>
 </div>
 `;
-  `;
 
   try {
     const res = await fetch("/api/chat", {
