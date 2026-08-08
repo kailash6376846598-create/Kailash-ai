@@ -29,6 +29,7 @@ function loadChat() {
 }
 
 window.onload = loadChat;
+
 async function sendMessage() {
   const prompt = promptInput.value.trim();
 
@@ -47,14 +48,13 @@ async function sendMessage() {
     });
   }
 
-  // 📷 Photo + 📄 PDF को Chat में दिखाना
   let attachmentHTML = "";
 
   if (imageBase64) {
     attachmentHTML += `
       <div style="margin-top:8px;">
         <img src="${imageBase64}"
-             style="max-width:220px;max-height:220px;border-radius:12px;">
+          style="max-width:220px;max-height:220px;border-radius:12px;">
       </div>
     `;
   }
@@ -81,79 +81,6 @@ async function sendMessage() {
       ${attachmentHTML}
     </div>
   `;
-    try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        prompt,
-        chatHistory,
-        hasImage: !!image,
-        imageBase64,
-        pdfText
-      })
-    });
-
-    const data = await res.json();
-
-    document.getElementById("thinking")?.remove();
-
-    responseDiv.innerHTML += `
-      <div class="ai-message">
-        ${data.reply || "No response"}
-      </div>
-    `;
-
-    chatHistory.push(
-      {
-        role: "user",
-        text: prompt
-      },
-      {
-        role: "assistant",
-        text: data.reply || "No response"
-      }
-    );
-
-    saveChat();
-
-    responseDiv.scrollTop = responseDiv.scrollHeight;
-
-    // 📷 Photo और 📄 PDF का preview हटाना
-    imageInput.value = "";
-    pdfInput.value = "";
-
-    document.getElementById("imagePreview").innerHTML = "";
-    document.getElementById("pdfPreview").innerHTML = "";
-
-    removeImageBtn.hidden = true;
-
-    pdfText = "";
-
-    // 🔊 AI Voice
-    if ("speechSynthesis" in window) {
-      speechSynthesis.cancel();
-
-      const speech = new SpeechSynthesisUtterance(
-        data.reply || "No response"
-      );
-
-      speech.lang = "hi-IN";
-      speechSynthesis.speak(speech);
-    }
-
-  } catch (err) {
-    document.getElementById("thinking")?.remove();
-
-    responseDiv.innerHTML += `
-      <div class="ai-message">
-        ❌ ${err.message}
-      </div>
-    `;
-  }
-}
 
   promptInput.value = "";
 
@@ -165,124 +92,6 @@ async function sendMessage() {
       <span class="dot"></span>
     </div>
   `;
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        prompt,
-        chatHistory,
-        hasImage: !!image,
-        imageBase64,
-        pdfText
-      })
-    });
-
-    const data = await res.json();
-
-    document.getElementById("thinking")?.remove();
-
-    responseDiv.innerHTML += `
-      <div class="ai-message">
-        ${data.reply || "No response"}
-      </div>
-    `;
-
-    chatHistory.push(
-      {
-        role: "user",
-        text: prompt
-      },
-      {
-        role: "assistant",
-        text: data.reply || "No response"
-      }
-    );
-
-    saveChat();
-
-    responseDiv.scrollTop = responseDiv.scrollHeight;
-
-    // 📷 Photo और 📄 PDF का preview हटाना
-    imageInput.value = "";
-    pdfInput.value = "";
-
-    document.getElementById("imagePreview").innerHTML = "";
-    document.getElementById("pdfPreview").innerHTML = "";
-
-    removeImageBtn.hidden = true;
-
-    pdfText = "";
-
-    // 🔊 AI Voice
-    if ("speechSynthesis" in window) {
-      speechSynthesis.cancel();
-
-      const speech = new SpeechSynthesisUtterance(
-        data.reply || "No response"
-      );
-
-      speech.lang = "hi-IN";
-      speechSynthesis.speak(speech);
-    }
-
-  } catch (err) {
-    document.getElementById("thinking")?.remove();
-
-    responseDiv.innerHTML += `
-      <div class="ai-message">
-        ❌ ${err.message}
-      </div>
-    `;
-  }
-}
-
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        prompt,
-        chatHistory,
-        hasImage: !!image,
-        imageBase64,
-        pdfText
-      })
-    });
-
-    const data = await res.json();
-
-    document.getElementById("thinking")?.remove();
-
-    responseDiv.innerHTML += `<div class="ai-message">${data.reply}</div>`;
-
-    chatHistory.push(
-      { role: "user", text: prompt },
-      { role: "assistant", text: data.reply }
-    );
-
-    saveChat();
-
-    responseDiv.scrollTop = responseDiv.scrollHeight;
-
-    if ("speechSynthesis" in window) {
-      speechSynthesis.cancel();
-      const speech = new SpeechSynthesisUtterance(data.reply);
-      speech.lang = "hi-IN";
-      speechSynthesis.speak(speech);
-    }
-
-  } catch (err) {
-    document.getElementById("thinking")?.remove();
-
-    responseDiv.innerHTML += `<div class="ai-message">❌ ${err.message}</div>`;
-  }
-}
-document.getElementById("prompt").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     sendMessage();
   }
