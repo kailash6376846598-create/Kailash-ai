@@ -47,17 +47,197 @@ async function sendMessage() {
     });
   }
 
-  responseDiv.innerHTML += `<div class="user-message">${prompt}</div>`;
+  // 📷 Photo + 📄 PDF को Chat में दिखाना
+  let attachmentHTML = "";
+
+  if (imageBase64) {
+    attachmentHTML += `
+      <div style="margin-top:8px;">
+        <img src="${imageBase64}"
+             style="max-width:220px;max-height:220px;border-radius:12px;">
+      </div>
+    `;
+  }
+
+  if (pdfInput.files.length > 0) {
+    const pdfFile = pdfInput.files[0];
+
+    attachmentHTML += `
+      <div style="
+        margin-top:8px;
+        padding:10px;
+        background:#30465a;
+        color:white;
+        border-radius:10px;
+      ">
+        📄 ${pdfFile.name}
+      </div>
+    `;
+  }
+
+  responseDiv.innerHTML += `
+    <div class="user-message">
+      ${prompt}
+      ${attachmentHTML}
+    </div>
+  `;
+    try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        prompt,
+        chatHistory,
+        hasImage: !!image,
+        imageBase64,
+        pdfText
+      })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("thinking")?.remove();
+
+    responseDiv.innerHTML += `
+      <div class="ai-message">
+        ${data.reply || "No response"}
+      </div>
+    `;
+
+    chatHistory.push(
+      {
+        role: "user",
+        text: prompt
+      },
+      {
+        role: "assistant",
+        text: data.reply || "No response"
+      }
+    );
+
+    saveChat();
+
+    responseDiv.scrollTop = responseDiv.scrollHeight;
+
+    // 📷 Photo और 📄 PDF का preview हटाना
+    imageInput.value = "";
+    pdfInput.value = "";
+
+    document.getElementById("imagePreview").innerHTML = "";
+    document.getElementById("pdfPreview").innerHTML = "";
+
+    removeImageBtn.hidden = true;
+
+    pdfText = "";
+
+    // 🔊 AI Voice
+    if ("speechSynthesis" in window) {
+      speechSynthesis.cancel();
+
+      const speech = new SpeechSynthesisUtterance(
+        data.reply || "No response"
+      );
+
+      speech.lang = "hi-IN";
+      speechSynthesis.speak(speech);
+    }
+
+  } catch (err) {
+    document.getElementById("thinking")?.remove();
+
+    responseDiv.innerHTML += `
+      <div class="ai-message">
+        ❌ ${err.message}
+      </div>
+    `;
+  }
+}
+
   promptInput.value = "";
 
   responseDiv.innerHTML += `
-<div id="thinking" class="ai-message thinking">
-  <span>🤖 Kailash AI</span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-</div>
-`;
+    <div id="thinking" class="ai-message thinking">
+      <span>🤖 Kailash AI</span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  `;
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        prompt,
+        chatHistory,
+        hasImage: !!image,
+        imageBase64,
+        pdfText
+      })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("thinking")?.remove();
+
+    responseDiv.innerHTML += `
+      <div class="ai-message">
+        ${data.reply || "No response"}
+      </div>
+    `;
+
+    chatHistory.push(
+      {
+        role: "user",
+        text: prompt
+      },
+      {
+        role: "assistant",
+        text: data.reply || "No response"
+      }
+    );
+
+    saveChat();
+
+    responseDiv.scrollTop = responseDiv.scrollHeight;
+
+    // 📷 Photo और 📄 PDF का preview हटाना
+    imageInput.value = "";
+    pdfInput.value = "";
+
+    document.getElementById("imagePreview").innerHTML = "";
+    document.getElementById("pdfPreview").innerHTML = "";
+
+    removeImageBtn.hidden = true;
+
+    pdfText = "";
+
+    // 🔊 AI Voice
+    if ("speechSynthesis" in window) {
+      speechSynthesis.cancel();
+
+      const speech = new SpeechSynthesisUtterance(
+        data.reply || "No response"
+      );
+
+      speech.lang = "hi-IN";
+      speechSynthesis.speak(speech);
+    }
+
+  } catch (err) {
+    document.getElementById("thinking")?.remove();
+
+    responseDiv.innerHTML += `
+      <div class="ai-message">
+        ❌ ${err.message}
+      </div>
+    `;
+  }
+}
 
   try {
     const res = await fetch("/api/chat", {
