@@ -1,11 +1,13 @@
 let chatHistory = [];
 let pdfText = "";
 
+// 📄 PDF.js setup
 if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc =
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 }
 
+// 🔗 HTML elements
 const promptInput = document.getElementById("prompt");
 const responseDiv = document.getElementById("response");
 
@@ -13,12 +15,19 @@ const imageInput = document.getElementById("imageInput");
 const imageBtn = document.getElementById("imageBtn");
 const removeImageBtn = document.getElementById("removeImageBtn");
 
+const pdfInput = document.getElementById("pdfInput");
+const pdfBtn = document.getElementById("pdfBtn");
+
 const micBtn = document.getElementById("micBtn");
 
+
+// 💾 Save Chat
 function saveChat() {
   localStorage.setItem("kailash_chat", responseDiv.innerHTML);
 }
 
+
+// 📂 Load Chat
 function loadChat() {
   const chat = localStorage.getItem("kailash_chat");
 
@@ -29,7 +38,6 @@ function loadChat() {
 }
 
 window.onload = loadChat;
-
 async function sendMessage() {
   const prompt = promptInput.value.trim();
 
@@ -40,21 +48,29 @@ async function sendMessage() {
   let imageBase64 = "";
   const image = imageInput.files[0];
 
+  // 📷 Photo को Base64 में बदलना
   if (image) {
     imageBase64 = await new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
+
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+
       reader.readAsDataURL(image);
     });
   }
 
+  // 📎 Attachment को Chat में दिखाना
   let attachmentHTML = "";
 
   if (imageBase64) {
     attachmentHTML += `
       <div style="margin-top:8px;">
-        <img src="${imageBase64}"
-          style="max-width:220px;max-height:220px;border-radius:12px;">
+        <img
+          src="${imageBase64}"
+          style="max-width:220px;max-height:220px;border-radius:12px;"
+        >
       </div>
     `;
   }
@@ -63,18 +79,21 @@ async function sendMessage() {
     const pdfFile = pdfInput.files[0];
 
     attachmentHTML += `
-      <div style="
-        margin-top:8px;
-        padding:10px;
-        background:#30465a;
-        color:white;
-        border-radius:10px;
-      ">
+      <div
+        style="
+          margin-top:8px;
+          padding:10px;
+          background:#30465a;
+          color:white;
+          border-radius:10px;
+        "
+      >
         📄 ${pdfFile.name}
       </div>
     `;
   }
 
+  // 💬 User message Chat में
   responseDiv.innerHTML += `
     <div class="user-message">
       ${prompt}
@@ -84,6 +103,7 @@ async function sendMessage() {
 
   promptInput.value = "";
 
+  // 🤖 Thinking 3 dots
   responseDiv.innerHTML += `
     <div id="thinking" class="ai-message thinking">
       <span>🤖 Kailash AI</span>
@@ -92,10 +112,91 @@ async function sendMessage() {
       <span class="dot"></span>
     </div>
   `;
+
+  responseDiv.scrollTop = responseDiv.scrollHeight;
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        prompt,
+        chatHistory,
+        hasImage: !!image,
+        imageBase64,
+        pdfText
+      })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("thinking")?.remove();
+
+    responseDiv.innerHTML += `
+      <div class="ai-message">
+        ${data.reply || "No response"}
+      </div>
+    `;
+
+    chatHistory.push(
+      {
+        role: "user",
+        text: prompt
+      },
+      {
+        role: "assistant",
+        text: data.reply || "No response"
+      }
+    );
+
+    saveChat();
+
+    responseDiv.scrollTop = responseDiv.scrollHeight;
+        // 📷 Photo और 📄 PDF preview साफ करना
+    imageInput.value = "";
+    pdfInput.value = "";
+
+    document.getElementById("imagePreview").innerHTML = "";
+    document.getElementById("pdfPreview").innerHTML = "";
+
+    removeImageBtn.hidden = true;
+
+    pdfText = "";
+
+    // 🔊 AI Voice
+    if ("speechSynthesis" in window) {
+      speechSynthesis.cancel();
+
+      const speech = new SpeechSynthesisUtterance(
+        data.reply || "No response"
+      );
+
+      speech.lang = "hi-IN";
+      speechSynthesis.speak(speech);
+    }
+
+  } catch (err) {
+    document.getElementById("thinking")?.remove();
+
+    responseDiv.innerHTML += `
+      <div class="ai-message">
+        ❌ ${err.message}
+      </div>
+    `;
+  }
+}
+// ⌨️ Enter से Message Send
+promptInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
+    e.preventDefault();
     sendMessage();
   }
 });
+
 
 // 🎤 Voice Input
 if ("webkitSpeechRecognition" in window) {
@@ -110,13 +211,14 @@ if ("webkitSpeechRecognition" in window) {
   });
 
   recognition.onresult = (event) => {
-    promptInput.value = event.results[0][0].transcript;
+    promptInput.value =
+      event.results[0][0].transcript;
   };
+
 } else {
   micBtn.disabled = true;
 }
-
-// 📎 Image Upload
+// 📷 Image Upload
 imageBtn.addEventListener("click", () => {
   imageInput.click();
 });
@@ -126,7 +228,14 @@ imageInput.addEventListener("change", () => {
 
   if (imageInput.files.length > 0) {
     const file = imageInput.files[0];
-    preview.innerHTML = `<img src="${URL.createObjectURL(file)}" style="max-width:120px;border-radius:10px;">`;
+
+    preview.innerHTML = `
+      <img
+        src="${URL.createObjectURL(file)}"
+        style="max-width:120px;border-radius:10px;"
+      >
+    `;
+
     removeImageBtn.hidden = false;
   } else {
     preview.innerHTML = "";
@@ -134,17 +243,24 @@ imageInput.addEventListener("change", () => {
   }
 });
 
+
+// ❌ Remove Image
 removeImageBtn.addEventListener("click", () => {
   imageInput.value = "";
+
   document.getElementById("imagePreview").innerHTML = "";
+
   removeImageBtn.hidden = true;
 });
+
 
 // 📄 PDF Button
 pdfBtn.addEventListener("click", () => {
   pdfInput.click();
 });
 
+
+// 📄 PDF Upload + Read
 pdfInput.addEventListener("change", async () => {
   const preview = document.getElementById("pdfPreview");
 
@@ -155,51 +271,74 @@ pdfInput.addEventListener("change", async () => {
   }
 
   const file = pdfInput.files[0];
+
   const pdfUrl = URL.createObjectURL(file);
 
-preview.innerHTML = `
-  <a href="${pdfUrl}" target="_blank" style="color: white; text-decoration: none;">
-    📄 ${file.name}
-  </a>
-`;
+  preview.innerHTML = `
+    <a
+      href="${pdfUrl}"
+      target="_blank"
+      style="color:white;text-decoration:none;"
+    >
+      📄 ${file.name}
+    </a>
+  `;
 
   try {
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    const pdf =
+      await pdfjsLib.getDocument({
+        data: arrayBuffer
+      }).promise;
 
     pdfText = "";
 
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
-      const text = await page.getTextContent();
 
-      pdfText += text.items.map(item => item.str).join(" ") + "\n";
+      const text =
+        await page.getTextContent();
+
+      pdfText +=
+        text.items
+          .map(item => item.str)
+          .join(" ") + "\n";
     }
+
   } catch (err) {
     alert("PDF Read Error: " + err.message);
   }
 });
-
 // ✏️ New Chat
-const newChatBtn = document.querySelector(".topbar span:last-child");
+const newChatBtn = document.getElementById("newChatBtn");
 
 newChatBtn.addEventListener("click", () => {
   if (confirm("नई चैट शुरू करनी है?")) {
     chatHistory = [];
     pdfText = "";
+
     localStorage.removeItem("kailash_chat");
+
     responseDiv.innerHTML = "";
-    document.getElementById("imagePreview").innerHTML = "";
-    document.getElementById("pdfPreview").innerHTML = "";
+
+    promptInput.value = "";
+
     imageInput.value = "";
     pdfInput.value = "";
+
+    document.getElementById("imagePreview").innerHTML = "";
+    document.getElementById("pdfPreview").innerHTML = "";
+
     removeImageBtn.hidden = true;
   }
 });
+
+
+// ☰ Menu
 const menuBtn = document.getElementById("menuBtn");
 const menu = document.getElementById("menu");
 const closeMenuBtn = document.getElementById("closeMenuBtn");
-const aboutBtn = document.getElementById("aboutBtn");
 
 menuBtn.addEventListener("click", () => {
   menu.hidden = false;
@@ -209,25 +348,51 @@ closeMenuBtn.addEventListener("click", () => {
   menu.hidden = true;
 });
 
+
+// ℹ️ About
+const aboutBtn = document.getElementById("aboutBtn");
+
 aboutBtn.addEventListener("click", () => {
-  alert("🤖 Kailash AI\n\nVersion: V1.0\nDeveloper: Kailash");
+  alert(
+    "🤖 Kailash AI\n\nVersion: V1.0\nDeveloper: Kailash"
+  );
+
   menu.hidden = true;
 });
-const newChatMenuBtn = document.getElementById("newChatMenuBtn");
+
+
+// 🆕 New Chat from Menu
+const newChatMenuBtn =
+  document.getElementById("newChatMenuBtn");
+
 newChatMenuBtn.addEventListener("click", () => {
   if (confirm("नई चैट शुरू करनी है?")) {
     chatHistory = [];
+    pdfText = "";
+
     localStorage.removeItem("kailash_chat");
 
     responseDiv.innerHTML = "";
     promptInput.value = "";
 
+    imageInput.value = "";
+    pdfInput.value = "";
+
+    document.getElementById("imagePreview").innerHTML = "";
+    document.getElementById("pdfPreview").innerHTML = "";
+
+    removeImageBtn.hidden = true;
+
     menu.hidden = true;
   }
 });
+
+
+// 🌙 / ☀️ Theme
 const themeBtn = document.getElementById("themeBtn");
 
-const savedTheme = localStorage.getItem("theme");
+const savedTheme =
+  localStorage.getItem("theme");
 
 if (savedTheme === "light") {
   document.body.classList.add("light-mode");
@@ -247,9 +412,17 @@ themeBtn.addEventListener("click", () => {
 
   menu.hidden = true;
 });
-const settingsBtn = document.getElementById("settingsBtn");
-const settingsPanel = document.getElementById("settingsPanel");
-const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+
+
+// ⚙️ Settings
+const settingsBtn =
+  document.getElementById("settingsBtn");
+
+const settingsPanel =
+  document.getElementById("settingsPanel");
+
+const closeSettingsBtn =
+  document.getElementById("closeSettingsBtn");
 
 settingsBtn.addEventListener("click", () => {
   settingsPanel.hidden = false;
