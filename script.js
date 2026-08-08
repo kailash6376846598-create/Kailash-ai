@@ -173,6 +173,13 @@ attachmentHTML += `
     if ("speechSynthesis" in window) {
       speechSynthesis.cancel();
 
+      const speech = new SpeechSynthesisUtterance(cleanReply);
+      const cleanReply = (data.reply || "No response")
+  .replace(/\*\*/g, "")
+  .replace(/\*/g, "")
+  .replace(/#/g, "")
+  .replace(/`/g, "")
+  .replace(/_/g, "");
       const speech = new SpeechSynthesisUtterance(
         data.reply || "No response"
       );
