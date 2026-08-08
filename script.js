@@ -166,7 +166,13 @@ pdfInput.addEventListener("change", async () => {
   }
 
   const file = pdfInput.files[0];
-  preview.innerHTML = `📄 ${file.name}`;
+  const pdfUrl = URL.createObjectURL(file);
+
+preview.innerHTML = `
+  <a href="${pdfUrl}" target="_blank" style="color: white; text-decoration: none;">
+    📄 ${file.name}
+  </a>
+`;
 
   try {
     const arrayBuffer = await file.arrayBuffer();
