@@ -25,7 +25,16 @@ const micBtn = document.getElementById("micBtn");
 function saveChat() {
   localStorage.setItem("kailash_chat", responseDiv.innerHTML);
 }
+// 📷 Photo और 📄 PDF preview साफ करना
+imageInput.value = "";
+pdfInput.value = "";
 
+document.getElementById("imagePreview").innerHTML = "";
+document.getElementById("pdfPreview").innerHTML = "";
+
+removeImageBtn.hidden = true;
+
+pdfText = "";
 
 // 📂 Load Chat
 function loadChat() {
