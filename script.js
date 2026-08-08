@@ -78,19 +78,22 @@ async function sendMessage() {
   if (pdfInput.files.length > 0) {
     const pdfFile = pdfInput.files[0];
 
-    attachmentHTML += `
-      <div
-        style="
-          margin-top:8px;
-          padding:10px;
-          background:#30465a;
-          color:white;
-          border-radius:10px;
-        "
-      >
-        📄 ${pdfFile.name}
-      </div>
-    `;
+attachmentHTML += `
+  <div style="
+    margin-top:8px;
+    padding:10px;
+    background:#30465a;
+    border-radius:10px;
+  ">
+    <a
+      href="${URL.createObjectURL(pdfFile)}"
+      target="_blank"
+      style="color:white;text-decoration:none;"
+    >
+      📄 ${pdfFile.name}
+    </a>
+  </div>
+`;
   }
 
   // 💬 User message Chat में
