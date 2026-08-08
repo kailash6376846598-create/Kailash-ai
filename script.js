@@ -183,6 +183,7 @@ if ("speechSynthesis" in window) {
   speech.lang = "hi-IN";
   speechSynthesis.speak(speech);
 }
+      } catch (err) {
     document.getElementById("thinking")?.remove();
 
     responseDiv.innerHTML += `
