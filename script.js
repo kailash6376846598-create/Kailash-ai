@@ -170,25 +170,19 @@ attachmentHTML += `
     pdfText = "";
 
     // 🔊 AI Voice
-    if ("speechSynthesis" in window) {
-      speechSynthesis.cancel();
+if ("speechSynthesis" in window) {
+  speechSynthesis.cancel();
 
-      const speech = new SpeechSynthesisUtterance(cleanReply);
-      const cleanReply = (data.reply || "No response")
-  .replace(/\*\*/g, "")
-  .replace(/\*/g, "")
-  .replace(/#/g, "")
-  .replace(/`/g, "")
-  .replace(/_/g, "");
-      const speech = new SpeechSynthesisUtterance(
-        data.reply || "No response"
-      );
+  const cleanReply = (data.reply || "No response")
+    .replace(/[*#`_~]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-      speech.lang = "hi-IN";
-      speechSynthesis.speak(speech);
-    }
+  const speech = new SpeechSynthesisUtterance(cleanReply);
 
-  } catch (err) {
+  speech.lang = "hi-IN";
+  speechSynthesis.speak(speech);
+}
     document.getElementById("thinking")?.remove();
 
     responseDiv.innerHTML += `
