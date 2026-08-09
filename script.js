@@ -443,7 +443,7 @@ plusBtn.addEventListener("click", () => {
 const cameraOption = document.getElementById("cameraOption");
 const photosOption = document.getElementById("photosOption");
 const filesOption = document.getElementById("filesOption");
-
+  
 // 📷 Camera
 cameraOption.addEventListener("click", () => {
   imageInput.setAttribute("capture", "environment");
