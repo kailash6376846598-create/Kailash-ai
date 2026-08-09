@@ -170,19 +170,8 @@ attachmentHTML += `
     pdfText = "";
 
     // 🔊 AI Voice
-if ("speechSynthesis" in window) {
-  speechSynthesis.cancel();
 
-  const cleanReply = (data.reply || "No response")
-    .replace(/[*#`_~]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
 
-  const speech = new SpeechSynthesisUtterance(cleanReply);
-
-  speech.lang = "hi-IN";
-  speechSynthesis.speak(speech);
-}
       } catch (err) {
     document.getElementById("thinking")?.remove();
 
