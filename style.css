@@ -120,18 +120,72 @@ body {
   cursor: pointer;
 }
 
+/* =========================
+   CHATGPT STYLE INPUT
+========================= */
+
+.input-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 12px;
+  background: #212121;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+}
+
+#prompt {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  background: #2f2f2f;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 24px;
+  font-size: 16px;
+  outline: none;
+}
+
+#prompt::placeholder {
+  color: #999;
+}
+
+#prompt:focus {
+  border-color: #666;
+}
+
+/* + / Mic / Live buttons */
+.input-area button {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: #2f2f2f;
+  color: white;
+  font-size: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 .input-area button:hover {
   background: #444;
 }
 
-/* Send Button */
-#sendBtn {
-  background: #ffffff;
-  color: #000000;
+/* + Button */
+.plus-btn {
+  font-size: 28px !important;
 }
 
-#sendBtn:hover {
-  background: #dddddd;
+/* Live Button */
+.live-btn {
+  font-size: 18px !important;
 }
 
 /* Scrollbar */
