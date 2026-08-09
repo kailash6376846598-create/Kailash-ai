@@ -1,24 +1,9 @@
-let chatHistory = [];
-let pdfText = "";
-
-// 📄 PDF.js setup
-if (window.pdfjsLib) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-}
-
-// 🔗 HTML elements
 const promptInput = document.getElementById("prompt");
 const responseDiv = document.getElementById("response");
 
 const imageInput = document.getElementById("imageInput");
-const imageBtn = document.getElementById("imageBtn");
 const removeImageBtn = document.getElementById("removeImageBtn");
-
-const pdfInput = document.getElementById("pdfInput");
-const pdfBtn = document.getElementById("pdfBtn");
-
-const micBtn = document.getElementById("micBtn");
+;
 
 
 // 💾 Save Chat
