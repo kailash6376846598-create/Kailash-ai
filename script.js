@@ -138,11 +138,26 @@ attachmentHTML += `
 
     document.getElementById("thinking")?.remove();
 
-    responseDiv.innerHTML += `
-      <div class="ai-message">
-        ${data.reply || "No response"}
-      </div>
-    `;
+    const replyText = data.reply || "No response";
+
+const cleanReply = replyText
+  .replace(/[*#`_~]/g, "")
+  .replace(/\s+/g, " ")
+  .trim();
+
+responseDiv.innerHTML += `
+  <div class="ai-message">
+    <div>${replyText}</div>
+
+    <button
+      class="speak-btn"
+      onclick="speakReply(this)"
+      data-text="${cleanReply.replace(/"/g, '&quot;')}"
+    >
+      🔊
+    </button>
+  </div>
+`;
 
     chatHistory.push(
       {
