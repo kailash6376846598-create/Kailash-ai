@@ -463,3 +463,28 @@ const plusMenu = document.getElementById("plusMenu");
 plusBtn.addEventListener("click", () => {
   plusMenu.hidden = !plusMenu.hidden;
 });
+// 📷 Camera / Photos / Files
+
+const cameraOption = document.getElementById("cameraOption");
+const photosOption = document.getElementById("photosOption");
+const filesOption = document.getElementById("filesOption");
+
+// 📷 Camera
+cameraOption.addEventListener("click", () => {
+  imageInput.setAttribute("capture", "environment");
+  imageInput.click();
+  plusMenu.hidden = true;
+});
+
+// 🖼️ Photos
+photosOption.addEventListener("click", () => {
+  imageInput.removeAttribute("capture");
+  imageInput.click();
+  plusMenu.hidden = true;
+});
+
+// 📄 Files
+filesOption.addEventListener("click", () => {
+  pdfInput.click();
+  plusMenu.hidden = true;
+});
