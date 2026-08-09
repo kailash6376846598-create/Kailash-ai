@@ -226,6 +226,22 @@ if ("webkitSpeechRecognition" in window) {
 } else {
   micBtn.disabled = true;
 }
+// 🔊 Speak AI Reply
+function speakReply(button) {
+  const text = button.getAttribute("data-text");
+
+  if (!text) return;
+
+  speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(text);
+
+  speech.lang = "hi-IN";
+  speech.rate = 1;
+  speech.pitch = 1;
+
+  speechSynthesis.speak(speech);
+}
 // 📷 Image Upload
 imageBtn.addEventListener("click", () => {
   imageInput.click();
