@@ -456,3 +456,10 @@ settingsBtn.addEventListener("click", () => {
 closeSettingsBtn.addEventListener("click", () => {
   settingsPanel.hidden = true;
 });
+// ➕ Plus Menu
+const plusBtn = document.getElementById("plusBtn");
+const plusMenu = document.getElementById("plusMenu");
+
+plusBtn.addEventListener("click", () => {
+  plusMenu.hidden = !plusMenu.hidden;
+});
