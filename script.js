@@ -3,7 +3,15 @@ const responseDiv = document.getElementById("response");
 
 const imageInput = document.getElementById("imageInput");
 const removeImageBtn = document.getElementById("removeImageBtn");
-;
+
+const pdfInput = document.getElementById("pdfInput");
+const micBtn = document.getElementById("micBtn");
+
+
+// 💾 Save Chat
+function saveChat() {
+  localStorage.setItem("kailash_chat", responseDiv.innerHTML);
+}
 
 
 // 💾 Save Chat
