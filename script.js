@@ -471,3 +471,12 @@ filesOption.addEventListener("click", () => {
   pdfInput.click();
   plusMenu.hidden = true;
 });
+// ➕ Plus Menu
+const plusBtn = document.getElementById("plusBtn");
+const plusMenu = document.getElementById("plusMenu");
+
+if (plusBtn && plusMenu) {
+  plusBtn.addEventListener("click", () => {
+    plusMenu.hidden = !plusMenu.hidden;
+  });
+}
