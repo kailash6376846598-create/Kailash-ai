@@ -38,21 +38,24 @@
   
 <button id="removeImageBtn" hidden>❌ Remove</button>
 
-<div class="input-area">  <input
+<div class="input-area">
+
+  <!-- + Button -->
+  <button id="plusBtn" class="plus-btn">＋</button>
+
+  <!-- Message Input -->
+  <input
     type="text"
     id="prompt"
     placeholder="Message Kailash AI..."
   >
- 
-  <input type="file" id="imageInput" accept="image/*" hidden>
 
-<button id="imageBtn">📎</button>
-<input type="file" id="pdfInput" accept=".pdf" hidden>
+  <!-- Mic -->
+  <button id="micBtn">🎤</button>
 
-<button id="pdfBtn">📄</button>
+  <!-- Live Voice -->
+  <button id="liveBtn" class="live-btn">🔵</button>
 
-  <button onclick="sendMessage()">➤</button>
-<button id="micBtn">🎤</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
