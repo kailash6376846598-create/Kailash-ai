@@ -620,3 +620,13 @@ button {
 button:active {
   transform: scale(0.95);
 }
+.send-btn {
+  background: #2196f3 !important;
+  color: white !important;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+}
