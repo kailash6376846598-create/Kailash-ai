@@ -294,12 +294,6 @@ removeImageBtn.addEventListener("click", () => {
 });
 
 
-// 📄 PDF Button
-pdfBtn.addEventListener("click", () => {
-  pdfInput.click();
-});
-
-
 // 📄 PDF Upload + Read
 pdfInput.addEventListener("change", async () => {
   const preview = document.getElementById("pdfPreview");
