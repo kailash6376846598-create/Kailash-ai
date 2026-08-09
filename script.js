@@ -263,26 +263,6 @@ imageInput.addEventListener("change", () => {
   }
 });
 
-imageInput.addEventListener("change", () => {
-  const preview = document.getElementById("imagePreview");
-
-  if (imageInput.files.length > 0) {
-    const file = imageInput.files[0];
-
-    preview.innerHTML = `
-      <img
-        src="${URL.createObjectURL(file)}"
-        style="max-width:120px;border-radius:10px;"
-      >
-    `;
-
-    removeImageBtn.hidden = false;
-  } else {
-    preview.innerHTML = "";
-    removeImageBtn.hidden = true;
-  }
-});
-
 
 // ❌ Remove Image
 removeImageBtn.addEventListener("click", () => {
