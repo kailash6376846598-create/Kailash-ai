@@ -243,8 +243,24 @@ function speakReply(button) {
   speechSynthesis.speak(speech);
 }
 // 📷 Image Upload
-imageBtn.addEventListener("click", () => {
-  imageInput.click();
+imageInput.addEventListener("change", () => {
+  const preview = document.getElementById("imagePreview");
+
+  if (imageInput.files.length > 0) {
+    const file = imageInput.files[0];
+
+    preview.innerHTML = `
+      <img
+        src="${URL.createObjectURL(file)}"
+        style="max-width:120px;border-radius:10px;"
+      >
+    `;
+
+    removeImageBtn.hidden = false;
+  } else {
+    preview.innerHTML = "";
+    removeImageBtn.hidden = true;
+  }
 });
 
 imageInput.addEventListener("change", () => {
