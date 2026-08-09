@@ -193,6 +193,44 @@ body {
   width: 6px;
 }
 
+/* =========================
+   PLUS MENU
+========================= */
+
+.plus-menu {
+  position: fixed;
+  bottom: 70px;
+  left: 12px;
+  background: #2f2f2f;
+  border: 1px solid #444;
+  border-radius: 14px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 1000;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+}
+
+.plus-menu[hidden] {
+  display: none !important;
+}
+
+.plus-menu button {
+  width: 180px;
+  padding: 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: white;
+  text-align: left;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.plus-menu button:hover {
+  background: #444;
+}
 #response::-webkit-scrollbar-thumb {
   background: #555;
   border-radius: 10px;
