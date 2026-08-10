@@ -1138,8 +1138,8 @@ document.addEventListener(
 
 console.log(
   "✅ Kailash AI JavaScript loaded successfully"
-);
-// 🔵 LIVE VOICE — STABLE VERSION
+  );
+// 🔵 LIVE VOICE + AI VOICE REPLY
 
 const liveBtn = document.getElementById("liveBtn");
 
@@ -1148,7 +1148,7 @@ let liveRecognition = null;
 
 if (
   liveBtn &&
-  ("webkitSpeechRecognition" in window)
+  "webkitSpeechRecognition" in window
 ) {
 
   liveRecognition =
@@ -1164,7 +1164,6 @@ if (
     if (liveMode) {
 
       liveMode = false;
-
       liveBtn.innerHTML = "🔵";
 
       liveRecognition.stop();
@@ -1172,78 +1171,119 @@ if (
       return;
     }
 
-
     liveMode = true;
-
     liveBtn.innerHTML = "🔴";
 
     try {
-
       liveRecognition.start();
-
     } catch (error) {
-
-      console.log(
-        "Live start error:",
-        error
-      );
-
+      console.log(error);
     }
 
   });
 
 
-  liveRecognition.onresult = async (event) => {
+  liveRecognition.onresult =
+    async (event) => {
 
-    const text =
-      event.results[0][0]
-        .transcript
-        .trim();
+      const text =
+        event.results[0][0]
+          .transcript
+          .trim();
 
-
-    if (!text) return;
-
-
-    promptInput.value = text;
+      if (!text) return;
 
 
-    // AI को message भेजो
-    await sendMessage();
+      // User की आवाज़ को input में डालना
+      promptInput.value = text;
 
 
-    // फिर Live mode बंद
-    liveMode = false;
+      // पहले normal AI response लेना
+      const oldLength =
+        responseDiv.children.length;
 
-    liveBtn.innerHTML = "🔵";
-
-  };
-
-
-  liveRecognition.onerror = (event) => {
-
-    console.log(
-      "Live Voice Error:",
-      event.error
-    );
-
-    liveMode = false;
-
-    liveBtn.innerHTML = "🔵";
-
-  };
+      await sendMessage();
 
 
-  liveRecognition.onend = () => {
+      // AI का नया message ढूँढना
+      const messages =
+        responseDiv.querySelectorAll(
+          ".ai-message"
+        );
 
-    if (liveMode) {
+
+      if (messages.length > 0) {
+
+        const lastMessage =
+          messages[messages.length - 1];
+
+
+        const textElement =
+          lastMessage.querySelector("div");
+
+
+        if (textElement) {
+
+          const aiText =
+            textElement.innerText.trim();
+
+
+          if (aiText) {
+
+            speechSynthesis.cancel();
+
+
+            const speech =
+              new SpeechSynthesisUtterance(
+                aiText
+              );
+
+            speech.lang = "hi-IN";
+            speech.rate = 1;
+            speech.pitch = 1;
+
+            speechSynthesis.speak(
+              speech
+            );
+
+          }
+
+        }
+
+      }
+
 
       liveMode = false;
-
       liveBtn.innerHTML = "🔵";
 
-    }
+    };
 
-  };
+
+  liveRecognition.onerror =
+    (event) => {
+
+      console.log(
+        "Live Voice Error:",
+        event.error
+      );
+
+      liveMode = false;
+      liveBtn.innerHTML = "🔵";
+
+    };
+
+
+  liveRecognition.onend =
+    () => {
+
+      if (liveMode) {
+
+        liveMode = false;
+        liveBtn.innerHTML = "🔵";
+
+      }
+
+    };
 
 
 } else {
@@ -1251,13 +1291,8 @@ if (
   if (liveBtn) {
 
     liveBtn.disabled = true;
-
     liveBtn.innerHTML = "⚪";
 
   }
-
-  console.log(
-    "Live Voice supported नहीं है"
-  );
 
 }
