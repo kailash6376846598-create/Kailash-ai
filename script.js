@@ -1155,7 +1155,7 @@ if (
     new webkitSpeechRecognition();
 
   liveRecognition.lang = "hi-IN";
-  liveRecognition.continuous = false;
+  liveRecognition.continuous = true;
   liveRecognition.interimResults = false;
 
 
