@@ -1,78 +1,186 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Kailash AI</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="topbar">
-  <span id="menuBtn">☰</span>
-  <h2>🤖 Kailash AI</h2>
-  <span id="newChatBtn">✏️</span>
-</div>
+  <!-- TOP BAR -->
+  <div class="topbar">
 
-<div id="menu" class="menu" hidden>
-  <button id="newChatMenuBtn">🆕 New Chat</button>
-  <button id="themeBtn">🌙 Dark Mode</button>
-  <button id="settingsBtn">⚙️ Settings</button>
-  <button id="aboutBtn">ℹ️ About</button>
-  <button id="closeMenuBtn">❌ Close</button>
-</div>
+    <span id="menuBtn">☰</span>
 
-  <div id="settingsPanel" hidden>
-  <h3>⚙️ Settings</h3>
+    <h2>🤖 Kailash AI</h2>
 
-  <p><b>Version:</b> V1.0</p>
-  <p><b>Developer:</b> Kailash</p>
+    <span id="newChatBtn">✏️</span>
 
-  <button id="closeSettingsBtn">Close</button>
   </div>
-<div id="response" class="chat-container"></div>
 
+
+  <!-- MENU -->
+  <div id="menu" class="menu" hidden>
+
+    <button id="newChatMenuBtn">
+      🆕 New Chat
+    </button>
+
+    <button id="themeBtn">
+      🌙 Dark Mode
+    </button>
+
+    <button id="settingsBtn">
+      ⚙️ Settings
+    </button>
+
+    <button id="aboutBtn">
+      ℹ️ About
+    </button>
+
+    <button id="closeMenuBtn">
+      ❌ Close
+    </button>
+
+  </div>
+
+
+  <!-- SETTINGS -->
+  <div id="settingsPanel" hidden>
+
+    <h3>⚙️ Settings</h3>
+
+    <p>
+      <b>Version:</b> V1.0
+    </p>
+
+    <p>
+      <b>Developer:</b> Kailash
+    </p>
+
+    <button id="closeSettingsBtn">
+      Close
+    </button>
+
+  </div>
+
+
+  <!-- CHAT AREA -->
+  <div id="response" class="chat-container"></div>
+
+
+  <!-- IMAGE PREVIEW -->
   <div id="imagePreview"></div>
 
+
+  <!-- PDF PREVIEW -->
   <div id="pdfPreview"></div>
-  
-<button id="removeImageBtn" hidden>❌ Remove</button>
 
-  <!-- + Menu -->
-<div id="plusMenu" class="plus-menu" hidden>
-  <button id="cameraOption">📷 Camera</button>
-  <button id="photosOption">🖼️ Photos</button>
-  <button id="filesOption">📄 Files</button>
-</div>
-  - + Menu -->
-<div id="plusMenu" class="plus-menu" hidden>
-  <button id="cameraOption">📷 Camera</button>
-  <button id="photosOption">🖼️ Photos</button>
-  <button id="filesOption">📄 Files</button>
-</div>
-  
-<div class="input-area">
 
-  <!-- + Button -->
-  <button id="plusBtn" class="plus-btn">＋</button>
+  <!-- REMOVE IMAGE -->
+  <button id="removeImageBtn" hidden>
+    ❌ Remove
+  </button>
 
-  <!-- Message Input -->
+
+  <!-- FILE INPUTS -->
   <input
-    type="text"
-    id="prompt"
-    placeholder="Message Kailash AI..."
+    type="file"
+    id="imageInput"
+    accept="image/*"
+    hidden
   >
 
-  <!-- Mic -->
-  <button id="micBtn">🎤</button>
-<button id="sendBtn" class="send-btn" onclick="sendMessage()">➤</button>
-  <!-- Live Voice -->
-  <button id="liveBtn" class="live-btn">🔵</button>
+  <input
+    type="file"
+    id="pdfInput"
+    accept=".pdf,application/pdf"
+    hidden
+  >
 
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="script.js"></script>
+  <!-- PLUS MENU -->
+  <div
+    id="plusMenu"
+    class="plus-menu"
+    hidden
+  >
+
+    <button id="cameraOption">
+      📷 Camera
+    </button>
+
+    <button id="photosOption">
+      🖼️ Photos
+    </button>
+
+    <button id="filesOption">
+      📄 Files
+    </button>
+
+  </div>
+    <!-- INPUT AREA -->
+  <div class="input-area">
+
+
+    <!-- PLUS BUTTON -->
+    <button
+      id="plusBtn"
+      class="plus-btn"
+    >
+      ＋
+    </button>
+
+
+    <!-- MESSAGE INPUT -->
+    <input
+      type="text"
+      id="prompt"
+      placeholder="Message Kailash AI..."
+    >
+
+
+    <!-- MICROPHONE -->
+    <button id="micBtn">
+      🎤
+    </button>
+
+
+    <!-- SEND BUTTON -->
+    <button
+      id="sendBtn"
+      class="send-btn"
+      onclick="sendMessage()"
+    >
+      ➤
+    </button>
+
+
+    <!-- LIVE VOICE -->
+    <button
+      id="liveBtn"
+      class="live-btn"
+    >
+      🔵
+    </button>
+
+  </div>
+
+
+  <!-- PDF.JS -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
+  </script>
+
+
+  <!-- KAILASH AI JAVASCRIPT -->
+  <script src="script.js"></script>
 
 </body>
+
 </html>
