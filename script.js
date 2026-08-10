@@ -1139,3 +1139,72 @@ document.addEventListener(
 console.log(
   "✅ Kailash AI JavaScript loaded successfully"
 );
+// 🔵 LIVE VOICE
+const liveBtn = document.getElementById("liveBtn");
+
+let liveMode = false;
+let liveRecognition = null;
+
+if ("webkitSpeechRecognition" in window && liveBtn) {
+
+  liveRecognition = new webkitSpeechRecognition();
+
+  liveRecognition.lang = "hi-IN";
+  liveRecognition.continuous = true;
+  liveRecognition.interimResults = false;
+
+  liveBtn.addEventListener("click", () => {
+
+    if (!liveMode) {
+
+      liveMode = true;
+
+      liveBtn.innerHTML = "🔴";
+
+      liveRecognition.start();
+
+    } else {
+
+      liveMode = false;
+
+      liveBtn.innerHTML = "🔵";
+
+      liveRecognition.stop();
+
+    }
+
+  });
+
+  liveRecognition.onresult = async (event) => {
+
+    const last =
+      event.results[event.results.length - 1];
+
+    const text =
+      last[0].transcript.trim();
+
+    if (!text) return;
+
+    promptInput.value = text;
+
+    await sendMessage();
+
+  };
+
+  liveRecognition.onend = () => {
+
+    if (liveMode) {
+
+      liveRecognition.start();
+
+    }
+
+  };
+
+} else {
+
+  console.log(
+    "Live Voice browser में supported नहीं है"
+  );
+
+}
