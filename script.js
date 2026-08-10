@@ -1262,33 +1262,6 @@ if (liveRecognition) {
     console.log("🎤 User:", text);
 
     promptInput.value = text;
-await sendMessage();
-
-// 🔊 AI का जवाब बोलो
-await speakLiveReply();
-    // AI को message भेजो
-    await sendMessage();
-
-  };
-
-}
-// 🔵 LIVE VOICE — PART 4
-// User की आवाज़ AI को भेजना
-
-if (liveRecognition) {
-
-  liveRecognition.onresult = async (event) => {
-
-    const text =
-      event.results[0][0]
-        .transcript
-        .trim();
-
-    if (!text) return;
-
-    console.log("🎤 User:", text);
-
-    promptInput.value = text;
 
     // 🤖 AI को सिर्फ एक बार message भेजना
     await sendMessage();
@@ -1297,6 +1270,81 @@ if (liveRecognition) {
     await speakLiveReply();
 
   };
+
+}
+// 🔵 LIVE VOICE — PART 5
+// AI Reply को आवाज़ में बोलना
+
+async function speakLiveReply() {
+
+  const messages =
+    responseDiv.querySelectorAll(".ai-message");
+
+  if (messages.length === 0) return;
+
+  const lastMessage =
+    messages[messages.length - 1];
+
+  const textElement =
+    lastMessage.querySelector("div");
+
+  if (!textElement) return;
+
+  const aiText =
+    textElement.innerText.trim();
+
+  if (!aiText) return;
+
+  // 🔇 पिछली speech बंद
+  speechSynthesis.cancel();
+
+  liveSpeaking = true;
+
+  const speech =
+    new SpeechSynthesisUtterance(aiText);
+
+  speech.lang = "hi-IN";
+  speech.rate = 1;
+  speech.pitch = 1;
+
+  speech.onend = () => {
+
+    liveSpeaking = false;
+
+    // 🔴 Live चालू है तो फिर सुनना
+    if (liveMode) {
+
+      setTimeout(() => {
+
+        try {
+          liveRecognition.start();
+
+          console.log(
+            "🎤 Live फिर से सुन रहा है..."
+          );
+
+        } catch (error) {
+
+          console.log(
+            "Restart error:",
+            error
+          );
+
+        }
+
+      }, 500);
+
+    }
+
+  };
+
+  speech.onerror = () => {
+
+    liveSpeaking = false;
+
+  };
+
+  speechSynthesis.speak(speech);
 
 }
 // 🔵 LIVE VOICE — PART 7
