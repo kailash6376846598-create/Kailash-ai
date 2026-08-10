@@ -1139,31 +1139,29 @@ document.addEventListener(
 console.log(
   "✅ Kailash AI JavaScript loaded successfully"
 );
-// 🔵 LIVE VOICE
+// 🔵 LIVE VOICE — STABLE VERSION
+
 const liveBtn = document.getElementById("liveBtn");
 
 let liveMode = false;
 let liveRecognition = null;
 
-if ("webkitSpeechRecognition" in window && liveBtn) {
+if (
+  liveBtn &&
+  ("webkitSpeechRecognition" in window)
+) {
 
-  liveRecognition = new webkitSpeechRecognition();
+  liveRecognition =
+    new webkitSpeechRecognition();
 
   liveRecognition.lang = "hi-IN";
-  liveRecognition.continuous = true;
+  liveRecognition.continuous = false;
   liveRecognition.interimResults = false;
+
 
   liveBtn.addEventListener("click", () => {
 
-    if (!liveMode) {
-
-      liveMode = true;
-
-      liveBtn.innerHTML = "🔴";
-
-      liveRecognition.start();
-
-    } else {
+    if (liveMode) {
 
       liveMode = false;
 
@@ -1171,40 +1169,95 @@ if ("webkitSpeechRecognition" in window && liveBtn) {
 
       liveRecognition.stop();
 
+      return;
+    }
+
+
+    liveMode = true;
+
+    liveBtn.innerHTML = "🔴";
+
+    try {
+
+      liveRecognition.start();
+
+    } catch (error) {
+
+      console.log(
+        "Live start error:",
+        error
+      );
+
     }
 
   });
 
+
   liveRecognition.onresult = async (event) => {
 
-    const last =
-      event.results[event.results.length - 1];
-
     const text =
-      last[0].transcript.trim();
+      event.results[0][0]
+        .transcript
+        .trim();
+
 
     if (!text) return;
 
+
     promptInput.value = text;
 
+
+    // AI को message भेजो
     await sendMessage();
 
+
+    // फिर Live mode बंद
+    liveMode = false;
+
+    liveBtn.innerHTML = "🔵";
+
   };
+
+
+  liveRecognition.onerror = (event) => {
+
+    console.log(
+      "Live Voice Error:",
+      event.error
+    );
+
+    liveMode = false;
+
+    liveBtn.innerHTML = "🔵";
+
+  };
+
 
   liveRecognition.onend = () => {
 
     if (liveMode) {
 
-      liveRecognition.start();
+      liveMode = false;
+
+      liveBtn.innerHTML = "🔵";
 
     }
 
   };
 
+
 } else {
 
+  if (liveBtn) {
+
+    liveBtn.disabled = true;
+
+    liveBtn.innerHTML = "⚪";
+
+  }
+
   console.log(
-    "Live Voice browser में supported नहीं है"
+    "Live Voice supported नहीं है"
   );
 
 }
