@@ -1272,54 +1272,32 @@ await speakLiveReply();
   };
 
 }
-// 🔵 LIVE VOICE — PART 5
-// AI Reply को आवाज़ में बोलना
+// 🔵 LIVE VOICE — PART 4
+// User की आवाज़ AI को भेजना
 
-async function speakLiveReply() {
+if (liveRecognition) {
 
-  const messages =
-    responseDiv.querySelectorAll(".ai-message");
+  liveRecognition.onresult = async (event) => {
 
-  if (messages.length === 0) return;
+    const text =
+      event.results[0][0]
+        .transcript
+        .trim();
 
-  const lastMessage =
-    messages[messages.length - 1];
+    if (!text) return;
 
-  const textElement =
-    lastMessage.querySelector("div");
+    console.log("🎤 User:", text);
 
-  if (!textElement) return;
+    promptInput.value = text;
 
-  const aiText =
-    textElement.innerText.trim();
+    // 🤖 AI को सिर्फ एक बार message भेजना
+    await sendMessage();
 
-  if (!aiText) return;
+    // 🔊 AI का जवाब बोलना
+    await speakLiveReply();
 
-  speechSynthesis.cancel();
-
-  liveSpeaking = true;
-
-  const speech =
-    new SpeechSynthesisUtterance(aiText);
-
-  speech.lang = "hi-IN";
-  speech.rate = 1;
-  speech.pitch = 1;
-
-  speech.onend = () => {
-    liveSpeaking = false;
-
-    // AI बोलने के बाद फिर से सुनना
-    if (liveMode) {
-      try {
-        liveRecognition.start();
-      } catch (error) {
-        console.log("Restart error:", error);
-      }
-    }
   };
 
-  speechSynthesis.speak(speech);
 }
 // 🔵 LIVE VOICE — PART 7
 // Voice खत्म होने पर फिर से सुनना
