@@ -1274,16 +1274,23 @@ if (
 
 
   liveRecognition.onend =
-    () => {
+  () => {
 
-      if (liveMode) {
+    if (liveMode) {
 
-        liveMode = false;
-        liveBtn.innerHTML = "🔵";
+      setTimeout(() => {
 
-      }
+        try {
+          liveRecognition.start();
+        } catch (error) {
+          console.log(error);
+        }
 
-    };
+      }, 300);
+
+    }
+
+  };
 
 
 } else {
