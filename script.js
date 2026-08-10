@@ -1,94 +1,183 @@
-const promptInput = document.getElementById("prompt");
-const responseDiv = document.getElementById("response");
+// ================================
+// 🤖 KAILASH AI - SCRIPT.JS
+// PART 1
+// ================================
 
-const imageInput = document.getElementById("imageInput");
-const removeImageBtn = document.getElementById("removeImageBtn");
+let chatHistory = [];
+let pdfText = "";
 
-const pdfInput = document.getElementById("pdfInput");
-const micBtn = document.getElementById("micBtn");
-
-
-// 💾 Save Chat
-function saveChat() {
-  localStorage.setItem("kailash_chat", responseDiv.innerHTML);
+// 📄 PDF.js setup
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 }
 
 
-// 💾 Save Chat
+// ================================
+// 🔗 HTML ELEMENTS
+// ================================
+
+const promptInput =
+  document.getElementById("prompt");
+
+const responseDiv =
+  document.getElementById("response");
+
+const imageInput =
+  document.getElementById("imageInput");
+
+const removeImageBtn =
+  document.getElementById("removeImageBtn");
+
+const pdfInput =
+  document.getElementById("pdfInput");
+
+const micBtn =
+  document.getElementById("micBtn");
+
+const sendBtn =
+  document.getElementById("sendBtn");
+
+const plusBtn =
+  document.getElementById("plusBtn");
+
+const plusMenu =
+  document.getElementById("plusMenu");
+
+
+// ================================
+// 💾 SAVE CHAT
+// ================================
+
 function saveChat() {
-  localStorage.setItem("kailash_chat", responseDiv.innerHTML);
+  localStorage.setItem(
+    "kailash_chat",
+    responseDiv.innerHTML
+  );
 }
 
-// 📂 Load Chat
+
+// ================================
+// 📂 LOAD CHAT
+// ================================
+
 function loadChat() {
-  const chat = localStorage.getItem("kailash_chat");
+  const chat =
+    localStorage.getItem("kailash_chat");
 
   if (chat) {
     responseDiv.innerHTML = chat;
-    responseDiv.scrollTop = responseDiv.scrollHeight;
+
+    responseDiv.scrollTop =
+      responseDiv.scrollHeight;
   }
 }
 
-window.onload = loadChat;
-async function sendMessage() {
-  const prompt = promptInput.value.trim();
 
-  if (!prompt && imageInput.files.length === 0 && pdfText === "") {
+// ================================
+// 🚀 PAGE LOAD
+// ================================
+
+window.addEventListener(
+  "load",
+  loadChat
+);
+// ================================
+// 💬 SEND MESSAGE
+// ================================
+
+async function sendMessage() {
+
+  const prompt =
+    promptInput.value.trim();
+
+  // अगर कुछ भी नहीं है तो वापस
+  if (
+    !prompt &&
+    imageInput.files.length === 0 &&
+    pdfText === ""
+  ) {
     return;
   }
 
+  // ================================
+  // 📷 IMAGE → BASE64
+  // ================================
+
   let imageBase64 = "";
-  const image = imageInput.files[0];
 
-  // 📷 Photo को Base64 में बदलना
+  const image =
+    imageInput.files[0];
+
   if (image) {
-    imageBase64 = await new Promise((resolve) => {
-      const reader = new FileReader();
 
-      reader.onload = () => {
-        resolve(reader.result);
-      };
+    imageBase64 =
+      await new Promise((resolve) => {
 
-      reader.readAsDataURL(image);
-    });
+        const reader =
+          new FileReader();
+
+        reader.onload = () => {
+          resolve(reader.result);
+        };
+
+        reader.readAsDataURL(image);
+      });
   }
 
-  // 📎 Attachment को Chat में दिखाना
+
+  // ================================
+  // 📎 ATTACHMENTS
+  // ================================
+
   let attachmentHTML = "";
 
   if (imageBase64) {
+
     attachmentHTML += `
       <div style="margin-top:8px;">
         <img
           src="${imageBase64}"
-          style="max-width:220px;max-height:220px;border-radius:12px;"
+          style="
+            max-width:220px;
+            max-height:220px;
+            border-radius:12px;
+          "
         >
       </div>
     `;
   }
 
-  if (pdfInput.files.length > 0) {
-    const pdfFile = pdfInput.files[0];
 
-attachmentHTML += `
-  <div style="
-    margin-top:8px;
-    padding:10px;
-    background:#30465a;
-    border-radius:10px;
-  ">
-    <a
-      href="${URL.createObjectURL(pdfFile)}"
-      target="_blank"
-      style="color:white;text-decoration:none;"
-    >
-      📄 ${pdfFile.name}
-    </a>
-  </div>
-`;
+  // ================================
+  // 📄 PDF
+  // ================================
+
+  if (
+    pdfInput &&
+    pdfInput.files.length > 0
+  ) {
+
+    const pdfFile =
+      pdfInput.files[0];
+
+    attachmentHTML += `
+      <div style="
+        margin-top:8px;
+        padding:10px;
+        background:#30465a;
+        border-radius:10px;
+      ">
+        📄 ${pdfFile.name}
+      </div>
+    `;
   }
 
-  // 💬 User message Chat में
+
+  // ================================
+  // 👤 USER MESSAGE
+  // ================================
+
   responseDiv.innerHTML += `
     <div class="user-message">
       ${prompt}
@@ -98,9 +187,16 @@ attachmentHTML += `
 
   promptInput.value = "";
 
-  // 🤖 Thinking 3 dots
+
+  // ================================
+  // 🤖 THINKING
+  // ================================
+
   responseDiv.innerHTML += `
-    <div id="thinking" class="ai-message thinking">
+    <div
+      id="thinking"
+      class="ai-message thinking"
+    >
       <span>🤖 Kailash AI</span>
       <span class="dot"></span>
       <span class="dot"></span>
@@ -108,49 +204,72 @@ attachmentHTML += `
     </div>
   `;
 
-  responseDiv.scrollTop = responseDiv.scrollHeight;
+  responseDiv.scrollTop =
+    responseDiv.scrollHeight;
+
+
+  // ================================
+  // 🌐 API REQUEST
+  // ================================
 
   try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
 
-      headers: {
-        "Content-Type": "application/json"
-      },
+    const res =
+      await fetch("/api/chat", {
+        method: "POST",
 
-      body: JSON.stringify({
-        prompt,
-        chatHistory,
-        hasImage: !!image,
-        imageBase64,
-        pdfText
-      })
-    });
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-    const data = await res.json();
+        body: JSON.stringify({
+          prompt: prompt,
+          chatHistory: chatHistory,
+          hasImage: !!image,
+          imageBase64: imageBase64,
+          pdfText: pdfText
+        })
+      });
 
-    document.getElementById("thinking")?.remove();
 
-    const replyText = data.reply || "No response";
+    const data =
+      await res.json();
 
-const cleanReply = replyText
-  .replace(/[*#`_~]/g, "")
-  .replace(/\s+/g, " ")
-  .trim();
 
-responseDiv.innerHTML += `
-  <div class="ai-message">
-    <div>${replyText}</div>
+    document
+      .getElementById("thinking")
+      ?.remove();
 
-    <button
-      class="speak-btn"
-      onclick="speakReply(this)"
-      data-text="${cleanReply.replace(/"/g, '&quot;')}"
-    >
-      🔊
-    </button>
-  </div>
-`;
+
+    const replyText =
+      data.reply ||
+      "No response";
+
+
+    // ================================
+    // 🤖 AI MESSAGE
+    // ================================
+
+    responseDiv.innerHTML += `
+      <div class="ai-message">
+        <div>${replyText}</div>
+
+        <button
+          class="speak-btn"
+          onclick="speakReply(this)"
+          data-text="${replyText
+            .replace(/"/g, "&quot;")}"
+        >
+          🔊
+        </button>
+      </div>
+    `;
+
+
+    // ================================
+    // 🧠 CHAT HISTORY
+    // ================================
 
     chatHistory.push(
       {
@@ -159,29 +278,21 @@ responseDiv.innerHTML += `
       },
       {
         role: "assistant",
-        text: data.reply || "No response"
+        text: replyText
       }
     );
 
+
     saveChat();
 
-    responseDiv.scrollTop = responseDiv.scrollHeight;
-        // 📷 Photo और 📄 PDF preview साफ करना
-    imageInput.value = "";
-    pdfInput.value = "";
+    responseDiv.scrollTop =
+      responseDiv.scrollHeight;
 
-    document.getElementById("imagePreview").innerHTML = "";
-    document.getElementById("pdfPreview").innerHTML = "";
+  } catch (err) {
 
-    removeImageBtn.hidden = true;
-
-    pdfText = "";
-
-    // 🔊 AI Voice
-
-
-      } catch (err) {
-    document.getElementById("thinking")?.remove();
+    document
+      .getElementById("thinking")
+      ?.remove();
 
     responseDiv.innerHTML += `
       <div class="ai-message">
@@ -190,293 +301,544 @@ responseDiv.innerHTML += `
     `;
   }
 }
-// ⌨️ Enter से Message Send
-promptInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    sendMessage();
+// ================================
+// ⌨️ ENTER KEY
+// ================================
+
+promptInput.addEventListener(
+  "keydown",
+  (e) => {
+
+    if (e.key === "Enter") {
+
+      e.preventDefault();
+
+      sendMessage();
+    }
   }
-});
+);
 
 
-// 🎤 Voice Input
-if ("webkitSpeechRecognition" in window) {
-  const recognition = new webkitSpeechRecognition();
+// ================================
+// 🎤 VOICE INPUT
+// ================================
 
-  recognition.lang = "hi-IN";
-  recognition.continuous = false;
-  recognition.interimResults = false;
+if (
+  "webkitSpeechRecognition"
+  in window
+) {
 
-  micBtn.addEventListener("click", () => {
-    recognition.start();
-  });
+  const recognition =
+    new webkitSpeechRecognition();
 
-  recognition.onresult = (event) => {
-    promptInput.value =
-      event.results[0][0].transcript;
-  };
+  recognition.lang =
+    "hi-IN";
+
+  recognition.continuous =
+    false;
+
+  recognition.interimResults =
+    false;
+
+
+  micBtn.addEventListener(
+    "click",
+    () => {
+
+      recognition.start();
+    }
+  );
+
+
+  recognition.onresult =
+    (event) => {
+
+      promptInput.value =
+        event.results[0][0]
+          .transcript;
+    };
+
+
+  recognition.onerror =
+    () => {
+
+      console.log(
+        "Voice input error"
+      );
+    };
 
 } else {
+
   micBtn.disabled = true;
 }
-// 🔊 Speak AI Reply
+
+
+// ================================
+// 🔊 AI VOICE
+// ================================
+
 function speakReply(button) {
-  const text = button.getAttribute("data-text");
+
+  const text =
+    button.getAttribute(
+      "data-text"
+    );
 
   if (!text) return;
 
   speechSynthesis.cancel();
 
-  const speech = new SpeechSynthesisUtterance(text);
+  const speech =
+    new SpeechSynthesisUtterance(
+      text
+    );
 
-  speech.lang = "hi-IN";
-  speech.rate = 1;
-  speech.pitch = 1;
+  speech.lang =
+    "hi-IN";
 
-  speechSynthesis.speak(speech);
+  speech.rate =
+    1;
+
+  speech.pitch =
+    1;
+
+  speechSynthesis.speak(
+    speech
+  );
 }
-// 📷 Image Upload
-imageInput.addEventListener("change", () => {
-  const preview = document.getElementById("imagePreview");
 
-  if (imageInput.files.length > 0) {
-    const file = imageInput.files[0];
 
-    preview.innerHTML = `
-      <img
-        src="${URL.createObjectURL(file)}"
-        style="max-width:120px;border-radius:10px;"
-      >
-    `;
+// ================================
+// 📷 IMAGE PREVIEW
+// ================================
 
-    removeImageBtn.hidden = false;
-  } else {
-    preview.innerHTML = "";
-    removeImageBtn.hidden = true;
+imageInput.addEventListener(
+  "change",
+  () => {
+
+    const preview =
+      document.getElementById(
+        "imagePreview"
+      );
+
+    if (
+      imageInput.files.length > 0
+    ) {
+
+      const file =
+        imageInput.files[0];
+
+      preview.innerHTML = `
+        <img
+          src="${URL.createObjectURL(file)}"
+          style="
+            max-width:120px;
+            border-radius:10px;
+          "
+        >
+      `;
+
+      removeImageBtn.hidden =
+        false;
+
+    } else {
+
+      preview.innerHTML = "";
+
+      removeImageBtn.hidden =
+        true;
+    }
   }
-});
+);
 
 
-// ❌ Remove Image
-removeImageBtn.addEventListener("click", () => {
-  imageInput.value = "";
+// ================================
+// ❌ REMOVE IMAGE
+// ================================
 
-  document.getElementById("imagePreview").innerHTML = "";
+removeImageBtn.addEventListener(
+  "click",
+  () => {
 
-  removeImageBtn.hidden = true;
-});
+    imageInput.value = "";
 
+    document.getElementById(
+      "imagePreview"
+    ).innerHTML = "";
 
-// 📄 PDF Upload + Read
-pdfInput.addEventListener("change", async () => {
-  const preview = document.getElementById("pdfPreview");
-
-  if (pdfInput.files.length === 0) {
-    preview.innerHTML = "";
-    pdfText = "";
-    return;
+    removeImageBtn.hidden =
+      true;
   }
+);
 
-  const file = pdfInput.files[0];
 
-  const pdfUrl = URL.createObjectURL(file);
+// ================================
+// 📄 PDF UPLOAD
+// ================================
 
-  preview.innerHTML = `
-    <a
-      href="${pdfUrl}"
-      target="_blank"
-      style="color:white;text-decoration:none;"
-    >
-      📄 ${file.name}
-    </a>
-  `;
+pdfInput.addEventListener(
+  "change",
+  async () => {
 
-  try {
-    const arrayBuffer = await file.arrayBuffer();
+    const preview =
+      document.getElementById(
+        "pdfPreview"
+      );
 
-    const pdf =
-      await pdfjsLib.getDocument({
-        data: arrayBuffer
-      }).promise;
+    if (
+      pdfInput.files.length === 0
+    ) {
 
-    pdfText = "";
+      preview.innerHTML = "";
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
+      pdfText = "";
 
-      const text =
-        await page.getTextContent();
-
-      pdfText +=
-        text.items
-          .map(item => item.str)
-          .join(" ") + "\n";
+      return;
     }
 
-  } catch (err) {
-    alert("PDF Read Error: " + err.message);
+
+    const file =
+      pdfInput.files[0];
+
+    preview.innerHTML = `
+      <div
+        style="
+          padding:10px;
+          color:white;
+        "
+      >
+        📄 ${file.name}
+      </div>
+    `;
+
+
+    try {
+
+      const arrayBuffer =
+        await file.arrayBuffer();
+
+      const pdf =
+        await pdfjsLib
+          .getDocument({
+            data: arrayBuffer
+          })
+          .promise;
+
+      pdfText = "";
+
+
+      for (
+        let i = 1;
+        i <= pdf.numPages;
+        i++
+      ) {
+
+        const page =
+          await
+          // ================================
+// ✏️ NEW CHAT
+// ================================
+
+const newChatBtn =
+  document.getElementById("newChatBtn");
+
+newChatBtn.addEventListener(
+  "click",
+  () => {
+
+    if (
+      confirm("नई चैट शुरू करनी है?")
+    ) {
+
+      chatHistory = [];
+      pdfText = "";
+
+      localStorage.removeItem(
+        "kailash_chat"
+      );
+
+      responseDiv.innerHTML = "";
+
+      promptInput.value = "";
+
+      imageInput.value = "";
+
+      pdfInput.value = "";
+
+      document.getElementById(
+        "imagePreview"
+      ).innerHTML = "";
+
+      document.getElementById(
+        "pdfPreview"
+      ).innerHTML = "";
+
+      removeImageBtn.hidden =
+        true;
+    }
   }
-});
-// ✏️ New Chat
-const newChatBtn = document.getElementById("newChatBtn");
-
-newChatBtn.addEventListener("click", () => {
-  if (confirm("नई चैट शुरू करनी है?")) {
-    chatHistory = [];
-    pdfText = "";
-
-    localStorage.removeItem("kailash_chat");
-
-    responseDiv.innerHTML = "";
-
-    promptInput.value = "";
-
-    imageInput.value = "";
-    pdfInput.value = "";
-
-    document.getElementById("imagePreview").innerHTML = "";
-    document.getElementById("pdfPreview").innerHTML = "";
-
-    removeImageBtn.hidden = true;
-  }
-});
+);
 
 
-// ☰ Menu
-const menuBtn = document.getElementById("menuBtn");
-const menu = document.getElementById("menu");
-const closeMenuBtn = document.getElementById("closeMenuBtn");
+// ================================
+// ☰ MENU
+// ================================
 
-menuBtn.addEventListener("click", () => {
-  menu.hidden = false;
-});
-
-closeMenuBtn.addEventListener("click", () => {
-  menu.hidden = true;
-});
-
-
-// ℹ️ About
-const aboutBtn = document.getElementById("aboutBtn");
-
-aboutBtn.addEventListener("click", () => {
-  alert(
-    "🤖 Kailash AI\n\nVersion: V1.0\nDeveloper: Kailash"
+const menuBtn =
+  document.getElementById(
+    "menuBtn"
   );
 
-  menu.hidden = true;
-});
+const menu =
+  document.getElementById("menu");
+
+const closeMenuBtn =
+  document.getElementById(
+    "closeMenuBtn"
+  );
 
 
-// 🆕 New Chat from Menu
-const newChatMenuBtn =
-  document.getElementById("newChatMenuBtn");
+menuBtn.addEventListener(
+  "click",
+  () => {
 
-newChatMenuBtn.addEventListener("click", () => {
-  if (confirm("नई चैट शुरू करनी है?")) {
-    chatHistory = [];
-    pdfText = "";
+    menu.hidden = false;
+  }
+);
 
-    localStorage.removeItem("kailash_chat");
 
-    responseDiv.innerHTML = "";
-    promptInput.value = "";
-
-    imageInput.value = "";
-    pdfInput.value = "";
-
-    document.getElementById("imagePreview").innerHTML = "";
-    document.getElementById("pdfPreview").innerHTML = "";
-
-    removeImageBtn.hidden = true;
+closeMenuBtn.addEventListener(
+  "click",
+  () => {
 
     menu.hidden = true;
   }
-});
+);
 
 
-// 🌙 / ☀️ Theme
-const themeBtn = document.getElementById("themeBtn");
+// ================================
+// ℹ️ ABOUT
+// ================================
+
+const aboutBtn =
+  document.getElementById(
+    "aboutBtn"
+  );
+
+aboutBtn.addEventListener(
+  "click",
+  () => {
+
+    alert(
+      "🤖 Kailash AI\n\n" +
+      "Version: V1.0\n" +
+      "Developer: Kailash"
+    );
+
+    menu.hidden = true;
+  }
+);
+
+
+// ================================
+// 🆕 NEW CHAT FROM MENU
+// ================================
+
+const newChatMenuBtn =
+  document.getElementById(
+    "newChatMenuBtn"
+  );
+
+newChatMenuBtn.addEventListener(
+  "click",
+  () => {
+
+    newChatBtn.click();
+
+    menu.hidden = true;
+  }
+);
+
+
+// ================================
+// 🌙 DARK / ☀️ LIGHT MODE
+// ================================
+
+const themeBtn =
+  document.getElementById(
+    "themeBtn"
+  );
 
 const savedTheme =
-  localStorage.getItem("theme");
+  localStorage.getItem(
+    "theme"
+  );
+
 
 if (savedTheme === "light") {
-  document.body.classList.add("light-mode");
-  themeBtn.innerHTML = "☀️ Light Mode";
+
+  document.body.classList.add(
+    "light-mode"
+  );
+
+  themeBtn.innerHTML =
+    "☀️ Light Mode";
 }
 
-themeBtn.addEventListener("click", () => {
-  document.body.classList.toggle("light-mode");
 
-  if (document.body.classList.contains("light-mode")) {
-    localStorage.setItem("theme", "light");
-    themeBtn.innerHTML = "☀️ Light Mode";
-  } else {
-    localStorage.setItem("theme", "dark");
-    themeBtn.innerHTML = "🌙 Dark Mode";
+themeBtn.addEventListener(
+  "click",
+  () => {
+
+    document.body.classList.toggle(
+      "light-mode"
+    );
+
+
+    if (
+      document.body.classList.contains(
+        "light-mode"
+      )
+    ) {
+
+      localStorage.setItem(
+        "theme",
+        "light"
+      );
+
+      themeBtn.innerHTML =
+        "☀️ Light Mode";
+
+    } else {
+
+      localStorage.setItem(
+        "theme",
+        "dark"
+      );
+
+      themeBtn.innerHTML =
+        "🌙 Dark Mode";
+    }
+
+    menu.hidden = true;
   }
-
-  menu.hidden = true;
-});
+);
 
 
-// ⚙️ Settings
+// ================================
+// ⚙️ SETTINGS
+// ================================
+
 const settingsBtn =
-  document.getElementById("settingsBtn");
+  document.getElementById(
+    "settingsBtn"
+  );
 
 const settingsPanel =
-  document.getElementById("settingsPanel");
+  document.getElementById(
+    "settingsPanel"
+  );
 
 const closeSettingsBtn =
-  document.getElementById("closeSettingsBtn");
+  document.getElementById(
+    "closeSettingsBtn"
+  );
 
-settingsBtn.addEventListener("click", () => {
-  settingsPanel.hidden = false;
-  menu.hidden = true;
-});
 
-closeSettingsBtn.addEventListener("click", () => {
-  settingsPanel.hidden = true;
-});
-// ➕ Plus Menu
-const plusBtn = document.getElementById("plusBtn");
-const plusMenu = document.getElementById("plusMenu");
+settingsBtn.addEventListener(
+  "click",
+  () => {
 
-plusBtn.addEventListener("click", () => {
-  plusMenu.hidden = !plusMenu.hidden;
-});
-// 📷 Camera / Photos / Files
+    settingsPanel.hidden = false;
 
-const cameraOption = document.getElementById("cameraOption");
-const photosOption = document.getElementById("photosOption");
-const filesOption = document.getElementById("filesOption");
-  
+    menu.hidden = true;
+  }
+);
+
+
+closeSettingsBtn.addEventListener(
+  "click",
+  () => {
+
+    settingsPanel.hidden = true;
+  }
+);
+
+
+// ================================
+// ➕ PLUS MENU
+// ================================
+
+plusBtn.addEventListener(
+  "click",
+  () => {
+
+    plusMenu.hidden =
+      !plusMenu.hidden;
+  }
+);
+
+
+// ================================
+// 📷 CAMERA / PHOTOS / FILES
+// ================================
+
+const cameraOption =
+  document.getElementById(
+    "cameraOption"
+  );
+
+const photosOption =
+  document.getElementById(
+    "photosOption"
+  );
+
+const filesOption =
+  document.getElementById(
+    "filesOption"
+  );
+
+
 // 📷 Camera
-cameraOption.addEventListener("click", () => {
-  imageInput.setAttribute("capture", "environment");
-  imageInput.click();
-  plusMenu.hidden = true;
-});
+cameraOption.addEventListener(
+  "click",
+  () => {
+
+    imageInput.setAttribute(
+      "capture",
+      "environment"
+    );
+
+    imageInput.click();
+
+    plusMenu.hidden = true;
+  }
+);
+
 
 // 🖼️ Photos
-photosOption.addEventListener("click", () => {
-  imageInput.removeAttribute("capture");
-  imageInput.click();
-  plusMenu.hidden = true;
-});
+photosOption.addEventListener(
+  "click",
+  () => {
+
+    imageInput.removeAttribute(
+      "capture"
+    );
+
+    imageInput.click();
+
+    plusMenu.hidden = true;
+  }
+);
+
 
 // 📄 Files
-filesOption.addEventListener("click", () => {
-  pdfInput.click();
-  plusMenu.hidden = true;
-});
-// ➕ Plus Menu
-const plusBtn = document.getElementById("plusBtn");
-const plusMenu = document.getElementById("plusMenu");
+filesOption.addEventListener(
+  "click",
+  () => {
 
-if (plusBtn && plusMenu) {
-  plusBtn.addEventListener("click", () => {
-    plusMenu.hidden = !plusMenu.hidden;
-  });
-}
+    pdfInput.click();
+
+    plusMenu.hidden = true;
+  }
+);
