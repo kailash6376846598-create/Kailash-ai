@@ -65,14 +65,6 @@ function loadChat() {
 loadChat();
 
 
-// Send Button
-if (sendBtn) {
-  sendBtn.addEventListener("click", () => {
-    sendMessage();
-  });
-}
-
-
 // Enter Button
 if (promptInput) {
   promptInput.addEventListener(
