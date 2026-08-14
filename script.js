@@ -138,14 +138,24 @@ async function sendMessage() {
   if (imageBase64) {
 
     attachmentHTML += `
-      <div style="margin-top:8px;">
-        <img
-          src="${imageBase64}"
-          style="
-            max-width:220px;
-            max-height:220px;
-            border-radius:12px;
-          "
+  <div style="
+  margin-top:8px;
+  display:inline-block;
+  line-height:0;
+">
+  <img
+    src="${imageBase64}"
+    style="
+      width:auto;
+      height:auto;
+      max-width:280px;
+      max-height:350px;
+      border-radius:12px;
+      object-fit:contain;
+      display:block;
+    "
+  >
+</div>  
         >
       </div>
     `;
