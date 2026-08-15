@@ -641,3 +641,13 @@ button:active {
 .user-message:has(img) > div:has(img) {
   display: inline-block;
 }
+/* Photo message — compact bubble */
+.user-message:has(img) {
+  width: fit-content;
+  max-width: 90%;
+  padding: 8px;
+}
+
+.user-message:has(img) img {
+  margin: 0;
+}
