@@ -630,3 +630,11 @@ button:active {
   font-size: 24px;
   font-weight: bold;
 }
+.user-message:has(img) {
+  width: fit-content;
+  max-width: 90%;
+}
+
+.user-message:has(img) > div:has(img) {
+  display: inline-block;
+}
