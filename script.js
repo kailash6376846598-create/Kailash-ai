@@ -122,7 +122,7 @@ if (image) {
 
         img.onload = () => {
 
-          const maxSize = 1280;
+          const maxSize = 800;
 
           let width = img.width;
           let height = img.height;
