@@ -645,9 +645,11 @@ button:active {
 .user-message:has(img) {
   width: fit-content;
   max-width: 90%;
-  padding: 8px;
+  padding: 4px;
+  box-sizing: border-box;
 }
 
 .user-message:has(img) img {
   margin: 0;
+  display: block;
 }
