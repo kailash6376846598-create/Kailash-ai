@@ -106,25 +106,75 @@ async function sendMessage() {
 
   let imageBase64 = "";
 
-  const image =
-    imageInput.files[0];
+const image =
+  imageInput.files[0];
 
-  if (image) {
+if (image) {
 
-    imageBase64 =
-      await new Promise((resolve) => {
+  imageBase64 =
+    await new Promise((resolve) => {
 
-        const reader =
-          new FileReader();
+      const reader = new FileReader();
 
-        reader.onload = () => {
-          resolve(reader.result);
+      reader.onload = () => {
+
+        const img = new Image();
+
+        img.onload = () => {
+
+          const maxSize = 1280;
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxSize || height > maxSize) {
+
+            if (width > height) {
+              height =
+                Math.round(height * maxSize / width);
+              width = maxSize;
+            } else {
+              width =
+                Math.round(width * maxSize / height);
+              height = maxSize;
+            }
+
+          }
+
+          const canvas =
+            document.createElement("canvas");
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx =
+            canvas.getContext("2d");
+
+          ctx.drawImage(
+            img,
+            0,
+            0,
+            width,
+            height
+          );
+
+          resolve(
+            canvas.toDataURL(
+              "image/jpeg",
+              0.7
+            )
+          );
+
         };
 
-        reader.readAsDataURL(image);
+        img.src = reader.result;
 
-      });
-  }
+      };
+
+      reader.readAsDataURL(image);
+
+    });
+}
 
 
   // ================================
