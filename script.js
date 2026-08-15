@@ -167,8 +167,12 @@ if (image) {
 
         };
 
-        img.src = reader.result;
-        
+                img.src = reader.result;
+      };
+
+      reader.readAsDataURL(image);
+    });
+}
 
 
   // ================================
