@@ -544,10 +544,13 @@ a {
 /* Images inside chat */
 .user-message img {
   display: block;
-  max-width: 220px;
-  max-height: 220px;
+  width: auto;
+  height: auto;
+  max-width: 280px;
+  max-height: 350px;
   border-radius: 12px;
   margin-top: 8px;
+  object-fit: contain;
 }
 
 
