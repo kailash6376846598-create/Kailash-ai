@@ -653,3 +653,25 @@ button:active {
   margin: 0;
   display: block;
 }
+/* Photo remove × button */
+#removeImageBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  width: 28px;
+  height: 28px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+
+  font-size: 20px;
+  line-height: 28px;
+  padding: 0;
+
+  cursor: pointer;
+  z-index: 10;
+}
