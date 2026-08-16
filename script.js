@@ -1464,3 +1464,57 @@ if (liveRecognition) {
   };
 
 }
+// ================================
+// ACTION BUTTON — MIC / SEND / LIVE
+// ================================
+
+const actionBtn =
+  document.getElementById("actionBtn");
+
+if (actionBtn && promptInput) {
+
+  function updateActionButton() {
+
+    if (promptInput.value.trim()) {
+
+      // Message लिखा है → SEND
+      actionBtn.innerHTML = "↑";
+      actionBtn.classList.add("send-mode");
+
+    } else {
+
+      // खाली है → LIVE VOICE
+      actionBtn.innerHTML = "🎙️";
+      actionBtn.classList.remove("send-mode");
+
+    }
+  }
+
+  promptInput.addEventListener(
+    "input",
+    updateActionButton
+  );
+
+  actionBtn.addEventListener(
+    "click",
+    () => {
+
+      if (promptInput.value.trim()) {
+
+        sendMessage();
+
+      } else if (typeof startLiveVoice === "function") {
+
+        startLiveVoice();
+
+      } else if (typeof liveBtn !== "undefined") {
+
+        liveBtn.click();
+
+      }
+
+    }
+  );
+
+  updateActionButton();
+}
