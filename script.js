@@ -1474,7 +1474,10 @@ if (actionBtn && promptInput) {
 
   function updateActionButton() {
 
-    if (promptInput.value.trim()) {
+    if (
+  promptInput.value.trim() ||
+  imageInput.files.length > 0
+) {
 
       // Message लिखा है → SEND
       actionBtn.innerHTML = "↑";
