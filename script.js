@@ -1499,7 +1499,10 @@ if (actionBtn && promptInput) {
     "click",
     () => {
 
-      if (promptInput.value.trim()) {
+      if (
+  promptInput.value.trim() ||
+  imageInput.files.length > 0
+) {
 
         sendMessage();
 
