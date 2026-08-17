@@ -568,13 +568,42 @@ if (imageInput) {
 
 
         imagePreview.innerHTML = `
-          <img
-            src="${imageUrl}"
-            style="
-              max-width:120px;
-              max-height:120px;
-              border-radius:10px;
-              margin:8px;
+  <div style="
+    position:relative;
+    display:inline-block;
+    margin:8px;
+  ">
+    <img
+      src="${imageUrl}"
+      style="
+        max-width:120px;
+        max-height:120px;
+        border-radius:10px;
+        display:block;
+      "
+    >
+
+    <button
+      type="button"
+      onclick="document.getElementById('removeImageBtn').click()"
+      style="
+        position:absolute;
+        top:-8px;
+        right:-8px;
+        width:24px;
+        height:24px;
+        border:none;
+        border-radius:50%;
+        background:#333;
+        color:white;
+        font-size:18px;
+        line-height:24px;
+        padding:0;
+        cursor:pointer;
+      "
+    >×</button>
+  </div>
+`;
             "
           >
         `;
