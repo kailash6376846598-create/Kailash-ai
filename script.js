@@ -19,22 +19,6 @@ const pdfInput = document.getElementById("pdfInput");
 
 const micBtn = document.getElementById("micBtn");
 const sendBtn = document.getElementById("sendBtn");
-function updateSendButton() {
-  if (
-    promptInput.value.trim() ||
-    imageInput.files.length > 0
-  ) {
-    sendBtn.innerHTML = "↑";
-  } else {
-    sendBtn.innerHTML = "🎙️";
-  }
-}
-
-promptInput.addEventListener("input", updateSendButton);
-
-imageInput.addEventListener("change", updateSendButton);
-
-updateSendButton();
 const imagePreview =
   document.getElementById("imagePreview");
 
