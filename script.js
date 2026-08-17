@@ -18,7 +18,7 @@ const removeImageBtn =
 const pdfInput = document.getElementById("pdfInput");
 
 const micBtn = document.getElementById("micBtn");
-const sendBtn = document.getElementById("sendBtn");
+const actionBtn = document.getElementById("actionBtn");
 const imagePreview =
   document.getElementById("imagePreview");
 
