@@ -584,7 +584,7 @@ if (imageInput) {
         removeImageBtn.hidden =
   false;
 
-sendBtn.innerHTML = "↑";
+actionBtn.innerHTML = "↑";
 
 } else {
 
