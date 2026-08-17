@@ -582,16 +582,19 @@ if (imageInput) {
 
 
         removeImageBtn.hidden =
-          false;
+  false;
 
-      } else {
+sendBtn.innerHTML = "↑";
 
-        imagePreview.innerHTML =
-          "";
+} else {
 
-        removeImageBtn.hidden =
-          true;
+  imagePreview.innerHTML =
+    "";
 
+  removeImageBtn.hidden =
+    true;
+
+  sendBtn.innerHTML = "🎙️";
       }
 
     }
