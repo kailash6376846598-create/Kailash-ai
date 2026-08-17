@@ -1486,7 +1486,7 @@ if (actionBtn && promptInput) {
     } else {
 
       // खाली है → LIVE VOICE
-      actionBtn.innerHTML = "🎙️";
+      actionBtn.innerHTML = "🔵";
       actionBtn.classList.remove("send-mode");
 
     }
