@@ -34,7 +34,6 @@ console.log("Response:", responseDiv);
 console.log("Image:", imageInput);
 console.log("PDF:", pdfInput);
 console.log("Mic:", micBtn);
-console.log("Send:", sendBtn);
 
 
 // Save Chat
