@@ -594,7 +594,7 @@ actionBtn.innerHTML = "↑";
   removeImageBtn.hidden =
     true;
 
-  sendBtn.innerHTML = "🎙️";
+  actionBtn.innerHTML = "🔵";;
       }
 
     }
