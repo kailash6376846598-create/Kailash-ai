@@ -1469,8 +1469,6 @@ if (liveRecognition) {
 // ACTION BUTTON — MIC / SEND / LIVE
 // ================================
 
-const actionBtn =
-  document.getElementById("actionBtn");
 
 if (actionBtn && promptInput) {
 
