@@ -568,20 +568,16 @@ if (imageInput) {
 
 
         imagePreview.innerHTML = `
-  <div style="
-    position:relative;
-    display:inline-block;
-    margin:8px;
-  ">
-    <img
-      src="${imageUrl}"
-      style="
-        max-width:120px;
-        max-height:120px;
-        border-radius:10px;
-        display:block;
-      "
-    >
+  <img
+    src="${imageUrl}"
+    style="
+      max-width:120px;
+      max-height:120px;
+      border-radius:10px;
+      margin:8px;
+    "
+  >
+`;
 
     <button
       type="button"
