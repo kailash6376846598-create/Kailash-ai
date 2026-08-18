@@ -568,16 +568,20 @@ if (imageInput) {
 
 
         imagePreview.innerHTML = `
-  <img
-    src="${imageUrl}"
-    style="
-      max-width:120px;
-      max-height:120px;
-      border-radius:10px;
-      margin:8px;
-    "
-  >
-`;
+  <div style="
+    position:relative;
+    display:inline-block;
+    margin:8px;
+  ">
+    <img
+      src="${imageUrl}"
+      style="
+        max-width:120px;
+        max-height:120px;
+        border-radius:10px;
+        display:block;
+      "
+    >
 
     <button
       type="button"
@@ -600,9 +604,10 @@ if (imageInput) {
     >×</button>
   </div>
 `;
-            "
-          >
-        `;
+
+removeImageBtn.hidden = false;
+
+actionBtn.innerHTML = "↑";
 
 
         removeImageBtn.hidden =
