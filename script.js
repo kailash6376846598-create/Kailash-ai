@@ -1220,18 +1220,16 @@ document.addEventListener(
 console.log(
   "✅ Kailash AI JavaScript loaded successfully"
   );
-// 🔵 LIVE VOICE — PART 1
-
-const liveBtn = document.getElementById("liveBtn");
+// ================================
+// LIVE VOICE — FIXED
+// ================================
 
 let liveMode = false;
 let liveRecognition = null;
 let liveSpeaking = false;
+let liveProcessing = false;
 
-if (
-  liveBtn &&
-  "webkitSpeechRecognition" in window
-) {
+if ("webkitSpeechRecognition" in window) {
 
   liveRecognition = new webkitSpeechRecognition();
 
@@ -1241,127 +1239,190 @@ if (
 
   console.log("✅ Live Voice ready");
 
-} else {
+}
 
-  console.log("❌ Live Voice supported नहीं है");
 
-  if (liveBtn) {
-    liveBtn.disabled = true;
-    liveBtn.innerHTML = "⚪";
+// ================================
+// START / STOP LIVE
+// ================================
+
+function startLiveVoice() {
+
+  if (!liveRecognition) {
+    console.log("❌ Live Voice supported नहीं है");
+    return;
+  }
+
+  if (liveMode) {
+
+    liveMode = false;
+    liveProcessing = false;
+
+    try {
+      liveRecognition.stop();
+    } catch (e) {}
+
+    speechSynthesis.cancel();
+
+    actionBtn.innerHTML = "🔵";
+
+    console.log("🔴 Live Voice बंद");
+
+    return;
+  }
+
+  liveMode = true;
+  liveProcessing = false;
+
+  actionBtn.innerHTML = "🔴";
+
+  try {
+    liveRecognition.start();
+
+    console.log(
+      "🎤 Live Voice शुरू"
+    );
+
+  } catch (e) {
+
+    console.log(
+      "Start waiting..."
+    );
+
   }
 
 }
-// 🔵 LIVE VOICE — PART 2
-// Live Button Start / Stop
 
-if (liveBtn && liveRecognition) {
 
-  liveBtn.addEventListener("click", () => {
+// ================================
+// USER VOICE
+// ================================
 
-    // 🔴 अगर Live चल रहा है तो बंद करो
-    if (liveMode) {
+if (liveRecognition) {
 
-      liveMode = false;
+  liveRecognition.onresult =
+    async (event) => {
 
-      liveBtn.innerHTML = "🔵";
+      const text =
+        event.results[0][0]
+          .transcript
+          .trim();
 
-      try {
-        liveRecognition.stop();
-      } catch (error) {
-        console.log("Stop error:", error);
+      if (!text || !liveMode) {
+        return;
       }
 
-      return;
-    }
-
-
-    // 🔴 Live शुरू
-    liveMode = true;
-
-    liveBtn.innerHTML = "🔴";
-
-    try {
-
-      liveRecognition.start();
-
-      console.log("🎤 Live Voice started");
-
-    } catch (error) {
-
       console.log(
-        "Start error:",
-        error
+        "🎤 User:",
+        text
       );
 
-    }
+      liveProcessing = true;
 
-  });
+      promptInput.value = text;
 
-}
-// 🔵 LIVE VOICE — PART 3
-// User की आवाज़ को text में लेना
+      // AI को भेजो
+      await sendMessage();
 
-if (liveRecognition) {
+      // AI का जवाब बोलो
+      await speakLiveReply();
 
-  liveRecognition.onresult = (event) => {
+    };
 
-    const text =
-      event.results[0][0]
-        .transcript
-        .trim();
 
-    if (!text) return;
+  // ================================
+  // LISTENING ENDED
+  // ================================
+
+  liveRecognition.onend = () => {
 
     console.log(
-      "🎤 User:",
-      text
+      "🎤 Listening ended"
     );
 
-    // बोलने की बात input में डालना
-    promptInput.value = text;
+    // AI जवाब तैयार कर रहा है
+    // तो अभी microphone शुरू मत करो
+    if (
+      liveMode &&
+      !liveSpeaking &&
+      !liveProcessing
+    ) {
 
-    // अभी AI को भेजना नहीं है
-    // वह PART 4 में करेंगे
+      setTimeout(() => {
 
-  };
+        try {
 
-}
-// 🔵 LIVE VOICE — PART 4
-// User की आवाज़ AI को भेजना
+          liveRecognition.start();
 
-if (liveRecognition) {
+          console.log(
+            "🎤 फिर से सुन रहा है..."
+          );
 
-  liveRecognition.onresult = async (event) => {
+        } catch (e) {
 
-    const text =
-      event.results[0][0]
-        .transcript
-        .trim();
+          console.log(
+            "Waiting..."
+          );
 
-    if (!text) return;
+        }
 
-    console.log("🎤 User:", text);
+      }, 500);
 
-    promptInput.value = text;
-
-    // 🤖 AI को सिर्फ एक बार message भेजना
-    await sendMessage();
-
-    // 🔊 AI का जवाब बोलना
-    await speakLiveReply();
+    }
 
   };
 
+
+  // ================================
+  // ERROR
+  // ================================
+
+  liveRecognition.onerror =
+    (event) => {
+
+      console.log(
+        "Live Voice Error:",
+        event.error
+      );
+
+      if (
+        liveMode &&
+        !liveSpeaking &&
+        !liveProcessing
+      ) {
+
+        setTimeout(() => {
+
+          try {
+            liveRecognition.start();
+          } catch (e) {}
+
+        }, 800);
+
+      }
+
+    };
+
 }
-// 🔵 LIVE VOICE — PART 5
-// AI Reply को आवाज़ में बोलना
+
+
+// ================================
+// AI VOICE
+// ================================
 
 async function speakLiveReply() {
 
   const messages =
-    responseDiv.querySelectorAll(".ai-message");
+    responseDiv.querySelectorAll(
+      ".ai-message"
+    );
 
-  if (messages.length === 0) return;
+  if (messages.length === 0) {
+
+    liveProcessing = false;
+    return;
+
+  }
 
   const lastMessage =
     messages[messages.length - 1];
@@ -1369,40 +1430,75 @@ async function speakLiveReply() {
   const textElement =
     lastMessage.querySelector("div");
 
-  if (!textElement) return;
+  if (!textElement) {
+
+    liveProcessing = false;
+    return;
+
+  }
 
   const aiText =
     textElement.innerText.trim();
 
-  if (!aiText) return;
+  if (!aiText) {
 
-  // 🔇 पिछली speech बंद
+    liveProcessing = false;
+    return;
+
+  }
+
   speechSynthesis.cancel();
 
   liveSpeaking = true;
 
   const speech =
-    new SpeechSynthesisUtterance(aiText);
+    new SpeechSynthesisUtterance(
+      aiText
+    );
 
   speech.lang = "hi-IN";
-  speech.rate = 1;
+  speech.rate = 0.95;
   speech.pitch = 1;
 
   speech.onend = () => {
 
     liveSpeaking = false;
+    liveProcessing = false;
 
-    // 🔴 Live चालू है तो फिर सुनना
+    // AI बोलना खत्म
+    // अब सिर्फ user को सुनो
     if (liveMode) {
 
       setTimeout(() => {
 
         try {
+
           liveRecognition.start();
 
           console.log(
-            "🎤 Live फिर से सुन रहा है..."
+            "🎤 आपकी अगली बात सुन रहा हूँ..."
           );
+
+        } catch (e) {}
+
+      }, 500);
+
+    }
+
+  };
+
+  speech.onerror = () => {
+
+    liveSpeaking = false;
+    liveProcessing = false;
+
+  };
+
+  speechSynthesis.speak(
+    speech
+  );
+
+}
 // ================================
 // ACTION BUTTON — MIC / SEND / LIVE
 // ================================
