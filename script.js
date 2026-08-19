@@ -1428,18 +1428,22 @@ async function speakLiveReply() {
   speechSynthesis.speak(speech);
 
 }
-// 🔵 LIVE VOICE — PART 7
+// LIVE VOICE — PART 7
 // Voice खत्म होने पर फिर से सुनना
 
 if (liveRecognition) {
 
   liveRecognition.onend = () => {
 
+    console.log("🎤 Listening ended");
+
+    // AI बोल रहा है तो दोबारा सुनना शुरू नहीं करना
     if (liveMode && !liveSpeaking) {
 
       setTimeout(() => {
 
         try {
+
           liveRecognition.start();
 
           console.log(
@@ -1449,13 +1453,12 @@ if (liveRecognition) {
         } catch (error) {
 
           console.log(
-            "Restart error:",
-            error
+            "Restart waiting..."
           );
 
         }
 
-      }, 300);
+      }, 800);
 
     }
 
