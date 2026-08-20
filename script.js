@@ -1221,7 +1221,7 @@ console.log(
   "✅ Kailash AI JavaScript loaded successfully"
   );
 // ================================
-// LIVE VOICE — FIXED
+// LIVE VOICE — CONTINUOUS
 // ================================
 
 let liveMode = false;
@@ -1234,11 +1234,13 @@ if ("webkitSpeechRecognition" in window) {
   liveRecognition = new webkitSpeechRecognition();
 
   liveRecognition.lang = "hi-IN";
-  liveRecognition.continuous = false;
+
+  // लगातार सुनना
+  liveRecognition.continuous = true;
+
   liveRecognition.interimResults = false;
 
-  console.log("✅ Live Voice ready");
-
+  console.log("✅ Continuous Live Voice ready");
 }
 
 
@@ -1253,6 +1255,7 @@ function startLiveVoice() {
     return;
   }
 
+  // अगर पहले से चालू है → खुद बंद करो
   if (liveMode) {
 
     liveMode = false;
@@ -1271,22 +1274,25 @@ function startLiveVoice() {
     return;
   }
 
+
+  // Live चालू
   liveMode = true;
   liveProcessing = false;
 
   actionBtn.innerHTML = "🔴";
 
   try {
+
     liveRecognition.start();
 
     console.log(
-      "🎤 Live Voice शुरू"
+      "🎤 Live Voice लगातार सुन रहा है..."
     );
 
   } catch (e) {
 
     console.log(
-      "Start waiting..."
+      "Live already running"
     );
 
   }
@@ -1300,53 +1306,45 @@ function startLiveVoice() {
 
 if (liveRecognition) {
 
-  liveRecognition.onresult =
-    async (event) => {
+  liveRecognition.onresult = async (event) => {
 
-      const text =
-        event.results[0][0]
-          .transcript
-          .trim();
+    const result =
+      event.results[event.results.length - 1];
 
-      if (!text || !liveMode) {
-        return;
-      }
+    const text =
+      result[0].transcript.trim();
 
-      console.log(
-        "🎤 User:",
-        text
-      );
+    if (!text || !liveMode) {
+      return;
+    }
 
-      liveProcessing = true;
+    console.log(
+      "🎤 User:",
+      text
+    );
 
-      promptInput.value = text;
+    liveProcessing = true;
 
-      // AI को भेजो
-      await sendMessage();
+    promptInput.value = text;
 
-      // AI का जवाब बोलो
-      await speakLiveReply();
+    // AI को message भेजो
+    await sendMessage();
 
-    };
+    // AI का जवाब बोलो
+    await speakLiveReply();
+
+  };
 
 
-  // ================================
-  // LISTENING ENDED
-  // ================================
-
+  // Recognition खत्म होने पर
+  // सिर्फ तब restart करो जब Live खुद चालू है
   liveRecognition.onend = () => {
 
     console.log(
-      "🎤 Listening ended"
+      "🎤 Recognition ended"
     );
 
-    // AI जवाब तैयार कर रहा है
-    // तो अभी microphone शुरू मत करो
-    if (
-      liveMode &&
-      !liveSpeaking &&
-      !liveProcessing
-    ) {
+    if (liveMode) {
 
       setTimeout(() => {
 
@@ -1355,7 +1353,7 @@ if (liveRecognition) {
           liveRecognition.start();
 
           console.log(
-            "🎤 फिर से सुन रहा है..."
+            "🎤 Live फिर सुन रहा है..."
           );
 
         } catch (e) {
@@ -1366,42 +1364,21 @@ if (liveRecognition) {
 
         }
 
-      }, 500);
+      }, 300);
 
     }
 
   };
 
 
-  // ================================
-  // ERROR
-  // ================================
+  liveRecognition.onerror = (event) => {
 
-  liveRecognition.onerror =
-    (event) => {
+    console.log(
+      "Live Voice Error:",
+      event.error
+    );
 
-      console.log(
-        "Live Voice Error:",
-        event.error
-      );
-
-      if (
-        liveMode &&
-        !liveSpeaking &&
-        !liveProcessing
-      ) {
-
-        setTimeout(() => {
-
-          try {
-            liveRecognition.start();
-          } catch (e) {}
-
-        }, 800);
-
-      }
-
-    };
+  };
 
 }
 
@@ -1418,10 +1395,8 @@ async function speakLiveReply() {
     );
 
   if (messages.length === 0) {
-
     liveProcessing = false;
     return;
-
   }
 
   const lastMessage =
@@ -1431,20 +1406,16 @@ async function speakLiveReply() {
     lastMessage.querySelector("div");
 
   if (!textElement) {
-
     liveProcessing = false;
     return;
-
   }
 
   const aiText =
     textElement.innerText.trim();
 
   if (!aiText) {
-
     liveProcessing = false;
     return;
-
   }
 
   speechSynthesis.cancel();
@@ -1465,25 +1436,9 @@ async function speakLiveReply() {
     liveSpeaking = false;
     liveProcessing = false;
 
-    // AI बोलना खत्म
-    // अब सिर्फ user को सुनो
-    if (liveMode) {
-
-      setTimeout(() => {
-
-        try {
-
-          liveRecognition.start();
-
-          console.log(
-            "🎤 आपकी अगली बात सुन रहा हूँ..."
-          );
-
-        } catch (e) {}
-
-      }, 500);
-
-    }
+    console.log(
+      "🔊 AI बोलना खत्म"
+    );
 
   };
 
