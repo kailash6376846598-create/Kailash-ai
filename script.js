@@ -1411,7 +1411,14 @@ async function speakLiveReply() {
   }
 
   const aiText =
-    textElement.innerText.trim();
+  textElement.innerText
+    .replace(/[*#`_~]/g, "")
+    .replace(
+      /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu,
+      ""
+    )
+    .replace(/\s+/g, " ")
+    .trim();
 
   if (!aiText) {
     liveProcessing = false;
