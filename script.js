@@ -1322,6 +1322,128 @@ function stopLiveSpeaking() {
   liveSpeaking = false;
 
 }
+if (liveRecognition) {
+
+  liveRecognition.onresult =
+    async (event) => {
+
+      if (!liveMode) return;
+
+      let text = "";
+
+      for (
+        let i = event.resultIndex;
+        i < event.results.length;
+        i++
+      ) {
+
+        if (event.results[i].isFinal) {
+
+          text +=
+            event.results[i][0].transcript;
+
+        }
+
+      }
+
+      text = text.trim();
+
+      if (!text) return;
+
+      console.log("🎤 User:", text);
+
+      // अगर AI बोल रही है तो तुरंत रोक दो
+      if (liveSpeaking) {
+        stopLiveSpeaking();
+      }
+
+      liveProcessing = true;
+
+      promptInput.value = text;
+
+      try {
+        liveRecognition.stop();
+      } catch (e) {}
+
+      await sendMessage();
+
+    };
+
+}
+if (liveRecognition) {
+
+  liveRecognition.onend = () => {
+
+    if (!liveMode) return;
+
+    if (liveSpeaking) return;
+
+    if (liveProcessing) return;
+
+    setTimeout(() => {
+
+      startLiveListening();
+
+    }, 300);
+
+  };
+
+}
+async function speakLiveReply() {
+
+  const messages =
+    responseDiv.querySelectorAll(
+      ".ai-message"
+    );
+
+  if (!messages.length) {
+
+    liveProcessing = false;
+
+    if (liveMode) {
+      startLiveListening();
+    }
+
+    return;
+  }
+
+  const lastMessage =
+    messages[messages.length - 1];
+
+  const textElement =
+    lastMessage.querySelector("div");
+
+  if (!textElement) {
+
+    liveProcessing = false;
+
+    if (liveMode) {
+      startLiveListening();
+    }
+
+    return;
+  }
+
+  const aiText =
+    cleanLiveText(
+      textElement.innerText
+    );
+
+  if (!aiText) {
+
+    liveProcessing = false;
+
+    if (liveMode) {
+      startLiveListening();
+    }
+
+    return;
+  }
+
+  stopLiveSpeaking();
+
+  liveSpeaking = true;
+  
 // ================================
 // ACTION BUTTON — MIC / SEND / LIVE
 // ================================
