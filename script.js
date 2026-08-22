@@ -1220,384 +1220,7 @@ document.addEventListener(
 console.log(
   "✅ Kailash AI JavaScript loaded successfully"
   );
-// ================================
-// LIVE VOICE — STABLE VERSION
-// ================================
-
-let liveMode = false;
-let liveRecognition = null;
-let liveSpeaking = false;
-let liveProcessing = false;
-let liveStarting = false;
-
-
-// ================================
-// CREATE RECOGNITION
-// ================================
-
-if ("webkitSpeechRecognition" in window) {
-
-  liveRecognition =
-    new webkitSpeechRecognition();
-
-  liveRecognition.lang = "hi-IN";
-
-  // एक बार में एक बात सुनना
-  liveRecognition.continuous = false;
-
-  liveRecognition.interimResults = false;
-
-  console.log(
-    "✅ Live Voice ready"
-  );
-
-}
-
-
-// ================================
-// START / STOP LIVE
-// ================================
-
-function startLiveVoice() {
-
-  if (!liveRecognition) {
-
-    console.log(
-      "❌ Live Voice supported नहीं है"
-    );
-
-    return;
-  }
-
-
-  // STOP LIVE
-  if (liveMode) {
-
-    liveMode = false;
-
-    liveProcessing = false;
-    liveSpeaking = false;
-    liveStarting = false;
-
-    try {
-      liveRecognition.stop();
-    } catch (e) {}
-
-    try {
-      speechSynthesis.cancel();
-    } catch (e) {}
-
-    actionBtn.innerHTML = "🔵";
-
-    console.log(
-      "🔴 Live Voice बंद"
-    );
-
-    return;
-  }
-
-
-  // START LIVE
-  liveMode = true;
-
-  liveProcessing = false;
-  liveSpeaking = false;
-  liveStarting = false;
-
-  actionBtn.innerHTML = "🔴";
-
-  startListening();
-
-}
-
-
-// ================================
-// START LISTENING
-// ================================
-
-function startListening() {
-
-  if (!liveMode) {
-    return;
-  }
-
-  if (liveSpeaking) {
-    return;
-  }
-
-  if (liveProcessing) {
-    return;
-  }
-
-  if (liveStarting) {
-    return;
-  }
-
-  liveStarting = true;
-
-  try {
-
-    liveRecognition.start();
-
-    console.log(
-      "🎤 Live सुन रहा है..."
-    );
-
-  } catch (error) {
-
-    console.log(
-      "🎤 Recognition already active"
-    );
-
-  }
-
-}
-
-
-// ================================
-// USER VOICE RESULT
-// ================================
-
-if (liveRecognition) {
-
-  liveRecognition.onresult =
-    async (event) => {
-
-      if (!liveMode) {
-        return;
-      }
-
-      const result =
-        event.results[
-          event.results.length - 1
-        ];
-
-      const text =
-        result[0]
-          .transcript
-          .trim();
-
-
-      if (!text) {
-        return;
-      }
-
-
-      console.log(
-        "🎤 User:",
-        text
-      );
-
-
-      // Recognition रोकना
-      // ताकि AI की आवाज़ न सुने
-      try {
-
-        liveRecognition.stop();
-
-      } catch (e) {}
-
-
-      liveStarting = false;
-
-      liveProcessing = true;
-
-
-      promptInput.value = text;
-
-
-      try {
-
-        await sendMessage();
-
-        if (!liveMode) {
-          return;
-        }
-
-        await speakLiveReply();
-
-
-      } catch (error) {
-
-        console.log(
-          "Live processing error:",
-          error
-        );
-
-        liveProcessing = false;
-
-      }
-
-    };
-  // ================================
-// RECOGNITION END
-// ================================
-
-if (liveRecognition) {
-
-  liveRecognition.onend = () => {
-
-    liveStarting = false;
-
-    console.log(
-      "🎤 Listening ended"
-    );
-
-
-    if (
-      liveMode &&
-      !liveSpeaking &&
-      !liveProcessing
-    ) {
-
-      setTimeout(() => {
-
-        startListening();
-
-      }, 300);
-
-    }
-
-  };
-
-
-  // ==============================
-  // ERROR
-  // ==============================
-
-  liveRecognition.onerror =
-    (event) => {
-
-      liveStarting = false;
-
-      console.log(
-        "Live Voice Error:",
-        event.error
-      );
-
-
-      if (!liveMode) {
-        return;
-      }
-
-
-      if (
-        event.error === "aborted"
-      ) {
-        return;
-      }
-
-
-      if (
-        !liveSpeaking &&
-        !liveProcessing
-      ) {
-
-        setTimeout(() => {
-
-          startListening();
-
-        }, 700);
-
-      }
-
-    };
-
-}
-
-
-// ================================
-// AI VOICE
-// ================================
-
-async function speakLiveReply() {
-
-  const messages =
-    responseDiv.querySelectorAll(
-      ".ai-message"
-    );
-
-
-  if (messages.length === 0) {
-
-    liveProcessing = false;
-
-    if (liveMode) {
-      startListening();
-    }
-
-    return;
-
-  }
-
-
-  const lastMessage =
-    messages[
-      messages.length - 1
-    ];
-
-
-  const textElement =
-    lastMessage.querySelector(
-      "div"
-    );
-
-
-  if (!textElement) {
-
-    liveProcessing = false;
-
-    if (liveMode) {
-      startListening();
-    }
-
-    return;
-
-  }
-
-
-  // ==============================
-  // CLEAN TEXT
-  // ==============================
-
-  const aiText =
-    textElement.innerText
-
-      // Markdown हटाओ
-      .replace(
-        /[*#`_~]/g,
-        ""
-      )
-
-      // Emoji हटाओ
-      .replace(
-        /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu,
-        ""
-      )
-
-      // Extra spaces हटाओ
-      .replace(
-        /\s+/g,
-        " "
-      )
-
-      .trim();
-
-
-  if (!aiText) {
-
-    liveProcessing = false;
-
-    if (liveMode) {
-      startListening();
-    }
-
-    return;
-
-  }
-
-
-  // ==============================
+======
   // OLD SPEECH STOP
   // ==============================
 
@@ -1683,7 +1306,221 @@ async function speakLiveReply() {
     speech
   );
 
+}  
+// ==========================================
+// AI VOICE — PART 2
+// ==========================================
+
+async function speakLiveReply() {
+
+  const messages =
+    responseDiv.querySelectorAll(
+      ".ai-message"
+    );
+
+
+  if (messages.length === 0) {
+
+    liveProcessing = false;
+
+    if (liveMode) {
+      startLiveListening();
     }
+
+    return;
+
+  }
+
+
+  const lastMessage =
+    messages[
+      messages.length - 1
+    ];
+
+
+  const textElement =
+    lastMessage.querySelector(
+      "div"
+    );
+
+
+  if (!textElement) {
+
+    liveProcessing = false;
+
+    if (liveMode) {
+      startLiveListening();
+    }
+
+    return;
+
+  }
+
+
+  // ========================================
+  // TEXT CLEAN
+  // ========================================
+
+  const aiText =
+    cleanLiveVoiceText(
+      textElement.innerText
+    );
+
+
+  if (!aiText) {
+
+    liveProcessing = false;
+
+    if (liveMode) {
+      startLiveListening();
+    }
+
+    return;
+
+  }
+
+
+  // ========================================
+  // पुरानी AI आवाज बंद
+  // ========================================
+
+  stopLiveSpeaking();
+
+
+  // ========================================
+  // AI बोलना शुरू
+  // ========================================
+
+  liveSpeaking = true;
+
+
+  const speech =
+    new SpeechSynthesisUtterance(
+      aiText
+    );
+
+
+  speech.lang = "hi-IN";
+
+  speech.rate = 0.95;
+
+  speech.pitch = 1;
+
+
+  // ========================================
+  // USER बीच में बोले
+  // ========================================
+
+  speech.onpause = () => {
+
+    console.log(
+      "🔊 AI speech paused"
+    );
+
+  };
+
+
+  // ========================================
+  // AI बोलना पूरा
+  // ========================================
+
+  speech.onend = () => {
+
+    liveSpeaking = false;
+
+    liveProcessing = false;
+
+
+    console.log(
+      "🔊 AI बोलना खत्म"
+    );
+
+
+    if (!liveMode) {
+      return;
+    }
+
+
+    // AI खत्म → फिर user को सुनो
+    setTimeout(() => {
+
+      if (
+        liveMode &&
+        !liveSpeaking &&
+        !liveProcessing
+      ) {
+
+        startLiveListening();
+
+      }
+
+    }, 350);
+
+  };
+
+
+  // ========================================
+  // SPEECH ERROR
+  // ========================================
+
+  speech.onerror = (error) => {
+
+    console.log(
+      "🔊 Speech error:",
+      error
+    );
+
+
+    liveSpeaking = false;
+
+    liveProcessing = false;
+
+
+    if (!liveMode) {
+      return;
+    }
+
+
+    setTimeout(() => {
+
+      if (
+        liveMode &&
+        !liveSpeaking &&
+        !liveProcessing
+      ) {
+
+        startLiveListening();
+
+      }
+
+    }, 350);
+
+  };
+
+
+  // ========================================
+  // SPEAK
+  // ========================================
+
+  try {
+
+    speechSynthesis.speak(
+      speech
+    );
+
+  } catch (error) {
+
+    console.log(
+      "Speech start error:",
+      error
+    );
+
+    liveSpeaking = false;
+    liveProcessing = false;
+
+  }
+
+}
 // ================================
 // ACTION BUTTON — MIC / SEND / LIVE
 // ================================
