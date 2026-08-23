@@ -1443,7 +1443,70 @@ async function speakLiveReply() {
   stopLiveSpeaking();
 
   liveSpeaking = true;
-  
+    const speech =
+    new SpeechSynthesisUtterance(
+      aiText
+    );
+
+  speech.lang = "hi-IN";
+  speech.rate = 0.95;
+  speech.pitch = 1;
+
+  speech.onend = () => {
+
+    liveSpeaking = false;
+    liveProcessing = false;
+
+    if (liveMode) {
+
+      setTimeout(() => {
+
+        startLiveListening();
+
+      }, 300);
+
+    }
+
+  };
+
+  speech.onerror = () => {
+
+    liveSpeaking = false;
+    liveProcessing = false;
+
+    if (liveMode) {
+      startLiveListening();
+    }
+
+  };
+
+  speechSynthesis.speak(speech);
+
+}
+function startLiveVoice() {
+
+  if (!liveRecognition) {
+    console.log("Live Voice supported नहीं है");
+    return;
+  }
+
+  if (liveMode) {
+
+    stopLiveVoice();
+
+    return;
+  }
+
+  liveMode = true;
+  liveProcessing = false;
+  liveSpeaking = false;
+  liveStarting = false;
+
+  actionBtn.innerHTML = "🔴";
+
+  startLiveListening();
+
+}
 // ================================
 // ACTION BUTTON — MIC / SEND / LIVE
 // ================================
