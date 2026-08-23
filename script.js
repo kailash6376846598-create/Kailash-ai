@@ -1366,7 +1366,7 @@ if (liveRecognition) {
       } catch (e) {}
 
       await sendMessage();
-
+await speakLiveReply();
     };
 
 }
@@ -1382,9 +1382,17 @@ if (liveRecognition) {
 
     setTimeout(() => {
 
+      if (!liveMode) return;
+
+      if (liveSpeaking) return;
+
+      if (liveProcessing) return;
+
+      liveStarting = false;
+
       startLiveListening();
 
-    }, 300);
+    }, 500);
 
   };
 
