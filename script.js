@@ -1361,10 +1361,6 @@ if (liveRecognition) {
 
       promptInput.value = text;
 
-      try {
-        liveRecognition.stop();
-      } catch (e) {}
-
       await sendMessage();
 await speakLiveReply();
     };
