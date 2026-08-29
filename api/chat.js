@@ -1,33 +1,46 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({
-      reply: "Method not allowed"
-    });
+    return res.status(405).json({ reply: "Method not allowed" });
   }
 
-  const {
-    prompt,
-    chatHistory = [],
-    imageBase64,
-    hasImage,
-    pdfText
-  } = req.body;
-
+  const { prompt, chatHistory = [], imageBase64, hasImage, pdfText } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({
-      reply: "GEMINI_API_KEY नहीं मिली।"
-    });
+    return res.status(500).json({ reply: "GEMINI_API_KEY नहीं मिली।" });
   }
 
-  // Keep request payloads bounded to avoid long processing times
-  const MAX_HISTORY = 12;
-  const shortHistory = Array.isArray(chatHistory)
-    ? chatHistory.slice(-MAX_HISTORY)
-    : [];
+  // Configurable defaults (override via env)
+  const MAX_HISTORY = Number(process.env.MAX_HISTORY) || 12;
+  const FETCH_TIMEOUT_MS = Number(process.env.FETCH_TIMEOUT_MS) || 25000;
+  const MAX_FETCH_RETRIES = Number(process.env.MAX_FETCH_RETRIES) || 3;
+  const MAX_IMAGE_BYTES = Number(process.env.MAX_IMAGE_BYTES) || 2_500_000; // ~2.5MB
 
-  // Build request body (preserve the systemInstruction and contents structure)
+  // Log incoming sizes for debugging
+  try {
+    const approxSize = JSON.stringify({ prompt, chatHistory }).length;
+    console.log(`Incoming request: promptLen=${prompt?.length || 0}, historyEntries=${chatHistory.length}, approxPayloadChars=${approxSize}`);
+  } catch (e) {}
+
+  // Validate image size (if provided)
+  if (imageBase64) {
+    const b64 = (imageBase64.split(',')[1] || '');
+    const approxBytes = Math.ceil(b64.length * 3 / 4);
+    if (approxBytes > MAX_IMAGE_BYTES) {
+      return res.status(413).json({ reply: "Image too large. Please use a smaller image." });
+    }
+  }
+
+  // Truncate very long pdfText for safety
+  let safePdfText = pdfText || '';
+  const MAX_PDF_CHARS = 80_000; // safety cap
+  if (safePdfText.length > MAX_PDF_CHARS) {
+    safePdfText = safePdfText.slice(0, MAX_PDF_CHARS) + '\n\n[Truncated PDF content]';
+  }
+
+  // Keep only the last N messages to limit payload
+  const shortHistory = Array.isArray(chatHistory) ? chatHistory.slice(-MAX_HISTORY) : [];
+
   const requestBody = {
     systemInstruction: {
       parts: [
@@ -53,7 +66,7 @@ Kailash AI
 अगर यूज़र पूछे:
 "तुम्हारा क्या काम है?"
 तो जवाब दो:
-"मेरा काम आपके सवालों के जवाब देना, जानकारी समझाना, फोटो और PDF को समझने में मद..."
+"मेरा काम आपके सवालों के जवाब देना, जानकारी समझाना, फोटो और PDF को समझने में मदद करना।"
 
 अगर यूज़र पूछे:
 "तुम्हें किसने बनाया?"
@@ -75,28 +88,25 @@ Kailash AI
     },
 
     contents: [
-      ...shortHistory.map(message => ({
-        role: message.role === "assistant" ? "model" : "user",
-        parts: [
-          { text: message.text }
-        ]
+      ...shortHistory.map((message) => ({
+        role: message.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: message.text }]
       })),
 
       {
-        role: "user",
+        role: 'user',
         parts: [
           {
-            text: pdfText
-              ? `PDF Content:\n${pdfText}\n\nUser Question:\n${prompt}`
+            text: safePdfText
+              ? `PDF Content:\n${safePdfText}\n\nUser Question:\n${prompt}`
               : prompt
           },
-
           ...(hasImage && imageBase64
             ? [
                 {
                   inlineData: {
-                    mimeType: "image/jpeg",
-                    data: imageBase64.split(",")[1]
+                    mimeType: 'image/jpeg',
+                    data: imageBase64.split(',')[1]
                   }
                 }
               ]
@@ -106,38 +116,27 @@ Kailash AI
     ]
   };
 
-  // Helper: fetch with timeout and retry on 429
+  // Helper: fetch with timeout + retries for 429
   async function fetchWithTimeoutAndRetries(url, options) {
-    const MAX_RETRIES = 3;
-    const BASE_DELAY = 500; // ms
-
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    for (let attempt = 0; attempt <= MAX_FETCH_RETRIES; attempt++) {
       const controller = new AbortController();
-      const timeoutMs = 25000; // 25s - fail early to avoid platform invocation timeout
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
       try {
-        const resp = await fetch(url, {
-          ...options,
-          signal: controller.signal
-        });
-
+        const resp = await fetch(url, { ...options, signal: controller.signal });
         clearTimeout(timer);
 
         if (resp.status === 429) {
-          // Respect Retry-After header if present
-          const retryAfter = resp.headers.get("Retry-After");
-          let delay = BASE_DELAY * Math.pow(2, attempt);
+          const retryAfter = resp.headers.get('Retry-After');
+          let delay = 500 * Math.pow(2, attempt);
           if (retryAfter) {
             const ra = parseInt(retryAfter, 10);
             if (!Number.isNaN(ra)) delay = Math.max(delay, ra * 1000);
           }
-
-          if (attempt < MAX_RETRIES) {
-            await new Promise(r => setTimeout(r, delay + Math.random() * 200));
+          if (attempt < MAX_FETCH_RETRIES) {
+            await new Promise((r) => setTimeout(r, delay + Math.random() * 200));
             continue;
           } else {
-            // Return the 429 response to be handled by caller
             return resp;
           }
         }
@@ -150,13 +149,11 @@ Kailash AI
           e.code = 'TIMEOUT';
           throw e;
         }
-
-        if (attempt < MAX_RETRIES) {
-          const delay = BASE_DELAY * Math.pow(2, attempt);
-          await new Promise(r => setTimeout(r, delay));
+        if (attempt < MAX_FETCH_RETRIES) {
+          const delay = 500 * Math.pow(2, attempt);
+          await new Promise((r) => setTimeout(r, delay));
           continue;
         }
-
         throw err;
       }
     }
@@ -166,42 +163,33 @@ Kailash AI
     const url = `https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
     const response = await fetchWithTimeoutAndRetries(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody)
     });
 
-    // If we ended with a 429 after retries, send a friendly message
     if (response.status === 429) {
       const data = await response.json().catch(() => ({}));
-      const msg = data.error?.message || "Rate limit (429). Please try again shortly.";
+      const msg = data.error?.message || 'Rate limit (429). Please try again shortly.';
       return res.status(429).json({ reply: msg });
     }
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      return res.status(response.status).json({
-        reply: data.error?.message || "AI से जवाब प्राप्त नहीं हो सका।"
-      });
+      return res.status(response.status).json({ reply: data.error?.message || 'AI से जवाब प्राप्त नहीं हो सका।' });
     }
 
     const data = await response.json();
+    console.log('Google Response:', data);
 
-    console.log("Google Response:", data);
-
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "मुझे अभी कोई जवाब नहीं मिला।";
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'मुझे अभी कोई जवाब नहीं मिला।';
 
     return res.status(200).json({ reply });
-
   } catch (error) {
-    console.error("ERROR:", error);
-
+    console.error('ERROR:', error);
     if (error.code === 'TIMEOUT') {
-      return res.status(504).json({ reply: "AI request timed out. Please try again." });
+      return res.status(504).json({ reply: 'AI request timed out. Please try again.' });
     }
-
-    return res.status(500).json({ reply: error.message || "Server error" });
+    return res.status(500).json({ reply: error.message || 'Server error' });
   }
 }
