@@ -83,7 +83,11 @@ if (promptInput) {
 // PART 2 — SEND MESSAGE
 // ================================
 
+let isSending = false; // Prevent concurrent sends
+
 async function sendMessage() {
+
+  if (isSending) return;
 
   const prompt =
     promptInput.value.trim();
@@ -97,93 +101,95 @@ async function sendMessage() {
     return;
   }
 
+  isSending = true;
 
-  // ================================
-  // IMAGE → BASE64
-  // ================================
+  try {
+    // ================================
+    // IMAGE → BASE64
+    // ================================
 
-  let imageBase64 = "";
+    let imageBase64 = "";
 
-const image =
-  imageInput.files[0];
+    const image =
+      imageInput.files[0];
 
-if (image) {
+    if (image) {
 
-  imageBase64 =
-    await new Promise((resolve) => {
+      imageBase64 =
+        await new Promise((resolve) => {
 
-      const reader = new FileReader();
+          const reader = new FileReader();
 
-      reader.onload = () => {
+          reader.onload = () => {
 
-        const img = new Image();
+            const img = new Image();
 
-        img.onload = () => {
+            img.onload = () => {
 
-          const maxSize = 800;
+              const maxSize = 800;
 
-          let width = img.width;
-          let height = img.height;
+              let width = img.width;
+              let height = img.height;
 
-          if (width > maxSize || height > maxSize) {
+              if (width > maxSize || height > maxSize) {
 
-            if (width > height) {
-              height =
-                Math.round(height * maxSize / width);
-              width = maxSize;
-            } else {
-              width =
-                Math.round(width * maxSize / height);
-              height = maxSize;
-            }
+                if (width > height) {
+                  height =
+                    Math.round(height * maxSize / width);
+                  width = maxSize;
+                } else {
+                  width =
+                    Math.round(width * maxSize / height);
+                  height = maxSize;
+                }
 
-          }
+              }
 
-          const canvas =
-            document.createElement("canvas");
+              const canvas =
+                document.createElement("canvas");
 
-          canvas.width = width;
-          canvas.height = height;
+              canvas.width = width;
+              canvas.height = height;
 
-          const ctx =
-            canvas.getContext("2d");
+              const ctx =
+                canvas.getContext("2d");
 
-          ctx.drawImage(
-            img,
-            0,
-            0,
-            width,
-            height
-          );
+              ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+              );
 
-          resolve(
-            canvas.toDataURL(
-              "image/jpeg",
-              0.7
-            )
-          );
+              resolve(
+                canvas.toDataURL(
+                  "image/jpeg",
+                  0.7
+                )
+              );
 
-        };
+            };
 
-                img.src = reader.result;
-      };
+            img.src = reader.result;
+          };
 
-      reader.readAsDataURL(image);
-    });
-}
-
-
-  // ================================
-  // ATTACHMENT HTML
-  // ================================
-
-  let attachmentHTML = "";
+          reader.readAsDataURL(image);
+        });
+    }
 
 
-  // Image attachment
-  if (imageBase64) {
+    // ================================
+    // ATTACHMENT HTML
+    // ================================
 
-    attachmentHTML += `
+    let attachmentHTML = "";
+
+
+    // Image attachment
+    if (imageBase64) {
+
+      attachmentHTML += `
   <div style="
   margin-top:8px;
   display:inline-block;
@@ -205,22 +211,22 @@ if (image) {
         >
       </div>
     `;
-  }
+    }
 
 
-  // PDF attachment
-  if (
-    pdfInput &&
-    pdfInput.files.length > 0
-  ) {
+    // PDF attachment
+    if (
+      pdfInput &&
+      pdfInput.files.length > 0
+    ) {
 
-    const pdfFile =
-      pdfInput.files[0];
+      const pdfFile =
+        pdfInput.files[0];
 
-    const pdfUrl =
-      URL.createObjectURL(pdfFile);
+      const pdfUrl =
+        URL.createObjectURL(pdfFile);
 
-    attachmentHTML += `
+      attachmentHTML += `
       <div style="
         margin-top:8px;
         padding:10px;
@@ -241,14 +247,14 @@ if (image) {
 
       </div>
     `;
-  }
+    }
 
 
-  // ================================
-  // USER MESSAGE
-  // ================================
+    // ================================
+    // USER MESSAGE
+    // ================================
 
-  responseDiv.innerHTML += `
+    responseDiv.innerHTML += `
     <div class="user-message">
 
       <div>
@@ -261,15 +267,15 @@ if (image) {
   `;
 
 
-  // Clear input
-  promptInput.value = "";
+    // Clear input
+    promptInput.value = "";
 
 
-  // ================================
-  // THINKING
-  // ================================
+    // ================================
+    // THINKING
+    // ================================
 
-  responseDiv.innerHTML += `
+    responseDiv.innerHTML += `
     <div
       id="thinking"
       class="ai-message thinking"
@@ -289,56 +295,83 @@ if (image) {
   `;
 
 
-  responseDiv.scrollTop =
-    responseDiv.scrollHeight;
-  // ================================
- // PART 3 — API + AI REPLY
- // ================================
+    responseDiv.scrollTop =
+      responseDiv.scrollHeight;
+    // ================================
+    // PART 3 — API + AI REPLY (with client-side retries)
+    // ================================
 
-  try {
+    const MAX_RETRIES = 2;
+    let attempt = 0;
+    let resObj = null;
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
+    while (attempt <= MAX_RETRIES) {
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
 
-      headers: {
-        "Content-Type": "application/json"
-      },
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-      body: JSON.stringify({
+          body: JSON.stringify({
 
-        prompt: prompt,
+            prompt: prompt,
 
-        chatHistory: chatHistory,
+            chatHistory: chatHistory,
 
-        hasImage: !!image,
+            hasImage: !!image,
 
-        imageBase64: imageBase64,
+            imageBase64: imageBase64,
 
-        pdfText: pdfText
+            pdfText: pdfText
 
-      })
+          })
 
-    });
+        });
 
+        // If OK, parse and break
+        if (res.ok) {
+          resObj = await res.json();
+          break;
+        }
 
-    // Check server response
-    if (!res.ok) {
+        // For rate limits and timeouts, retry with backoff
+        if (res.status === 429 || res.status === 504) {
+          const thinkingEl = document.getElementById('thinking');
+          if (thinkingEl) {
+            thinkingEl.querySelector('span').innerText = `🤖 Retrying... (attempt ${attempt + 1})`;
+          }
 
-      const errorText =
-        await res.text();
+          const wait = 500 * Math.pow(2, attempt) + Math.random() * 200;
+          await new Promise(r => setTimeout(r, wait));
 
-      throw new Error(
-        "Server Error: " +
-        res.status +
-        " " +
-        errorText
-      );
+          attempt++;
+          continue;
+        }
 
+        // Other errors: surface message
+        const errorText = await res.text();
+        throw new Error("Server Error: " + res.status + " " + errorText);
+
+      } catch (error) {
+        // If last attempt, rethrow to be handled below
+        if (attempt >= MAX_RETRIES) throw error;
+
+        // Transient network error: backoff and retry
+        const thinkingEl = document.getElementById('thinking');
+        if (thinkingEl) {
+          thinkingEl.querySelector('span').innerText = `🤖 Network issue, retrying... (attempt ${attempt + 1})`;
+        }
+        const wait = 500 * Math.pow(2, attempt) + Math.random() * 200;
+        await new Promise(r => setTimeout(r, wait));
+        attempt++;
+      }
     }
 
-
-    const data =
-      await res.json();
+    if (!resObj) {
+      throw new Error('AI did not return a response.');
+    }
 
 
     // Remove thinking
@@ -349,7 +382,7 @@ if (image) {
 
     // AI reply
     const replyText =
-      data.reply || "No response";
+      resObj.reply || "No response";
 
 
     // Clean text for voice
@@ -452,9 +485,11 @@ if (image) {
     responseDiv.scrollTop =
       responseDiv.scrollHeight;
 
+  } finally {
+    isSending = false;
   }
 
-      }
+}
 // ================================
 // PART 4 — VOICE INPUT
 // ================================
