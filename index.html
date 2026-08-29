@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Kailash AI</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -15,161 +13,66 @@
   <!-- TOP BAR -->
   <div class="topbar">
 
-    <span id="menuBtn">☰</span>
+    <span id="menuBtn">मेन्यू</span>
 
-    <h2>🤖 Kailash AI</h2>
+    <h2>कैलाश AI</h2>
 
-    <span id="newChatBtn">✏️</span>
+    <span id="newChatBtn">नया चैट</span>
 
   </div>
-
 
   <!-- MENU -->
   <div id="menu" class="menu" hidden>
-
-    <button id="newChatMenuBtn">
-      🆕 New Chat
-    </button>
-
-    <button id="themeBtn">
-      🌙 Dark Mode
-    </button>
-
-    <button id="settingsBtn">
-      ⚙️ Settings
-    </button>
-
-    <button id="aboutBtn">
-      ℹ️ About
-    </button>
-
-    <button id="closeMenuBtn">
-      ❌ Close
-    </button>
-
+    <button id="newChatMenuBtn">नया चैट</button>
+    <button id="themeBtn">Theme</button>
+    <button id="aboutBtn">About</button>
   </div>
 
-
-  <!-- SETTINGS -->
+  <!-- SETTINGS PANEL (hidden by default) -->
   <div id="settingsPanel" hidden>
-
-    <h3>⚙️ Settings</h3>
-
-    <p>
-      <b>Version:</b> V1.0
-    </p>
-
-    <p>
-      <b>Developer:</b> Kailash
-    </p>
-
-    <button id="closeSettingsBtn">
-      Close
-    </button>
-
+    <h3>Settings</h3>
+    <p>Version: V1.0</p>
+    <p>Developer: Kailash</p>
+    <button id="closeSettings">Close</button>
   </div>
-
 
   <!-- CHAT AREA -->
   <div id="response" class="chat-container"></div>
 
-
-  <!-- IMAGE PREVIEW -->
+  <!-- IMAGE / PDF PREVIEW -->
   <div id="imagePreview"></div>
-
-
-  <!-- PDF PREVIEW -->
   <div id="pdfPreview"></div>
 
-
-  <!-- REMOVE IMAGE -->
-  <button id="removeImageBtn" hidden>
-  ×
-  </button>
-
+  <!-- REMOVE IMAGE BUTTON -->
+  <button id="removeImageBtn" hidden>Remove Image</button>
 
   <!-- FILE INPUTS -->
-  <input
-    type="file"
-    id="imageInput"
-    accept="image/*"
-    hidden
-  >
+  <input type="file" id="imageInput" accept="image/*" hidden>
+  <input type="file" id="pdfInput" accept="application/pdf" hidden>
 
-  <input
-    type="file"
-    id="pdfInput"
-    accept=".pdf,application/pdf"
-    hidden
-  >
+  <!-- PLUS MENU (hidden) -->
+  <div id="plusMenu" class="plus-menu" hidden></div>
 
-
-  <!-- PLUS MENU -->
-  <div
-    id="plusMenu"
-    class="plus-menu"
-    hidden
-  >
-
-    <button id="cameraOption">
-      📷 Camera
-    </button>
-
-    <button id="photosOption">
-      🖼️ Photos
-    </button>
-
-    <button id="filesOption">
-      📄 Files
-    </button>
-
-  </div>
-    <!-- INPUT AREA -->
+  <!-- INPUT AREA -->
   <div class="input-area">
+    <button id="plusBtn" class="plus">+</button>
+    <input id="prompt" type="text" placeholder="Message Kailash AI...">
+    <button id="micBtn">🎤</button>
+    <button id="actionBtn">Send</button>
+  </div>
 
+  <!-- Voice recorder controls (added for feature/live-voice) -->
+  <div id="voiceControls" style="padding:12px; display:flex; gap:8px; align-items:center;">
+    <button id="startRecord">Record</button>
+    <button id="stopRecord" disabled>Stop</button>
+    <button id="playTTS" disabled>Play TTS</button>
+    <audio id="ttsPlayer" controls hidden></audio>
+    <span id="recStatus" style="margin-left:8px;color:#666"></span>
+  </div>
 
-    <!-- PLUS BUTTON -->
-    <button
-      id="plusBtn"
-      class="plus-btn"
-    >
-      ＋
-    </button>
-
-
-    <!-- MESSAGE INPUT -->
-    <input
-      type="text"
-      id="prompt"
-      placeholder="Message Kailash AI..."
-    >
-
-
-    <!-- MICROPHONE -->
-    <button id="micBtn">
-      🎤
-    </button>
-
-
-    <!-- ACTION BUTTON -->
-<button
-  id="actionBtn"
-  class="send-btn"
-  type="button"
->
-  🎙️
-</button>
-
-
-  <!-- PDF.JS -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
-  </script>
-
-
-  <!-- KAILASH AI JAVASCRIPT -->
+  <!-- SCRIPTS -->
   <script src="script.js"></script>
-
+  <script src="voice_client.js"></script>
 </body>
 
 </html>
