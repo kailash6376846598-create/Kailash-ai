@@ -188,19 +188,19 @@ if (image) {
   margin-top:8px;
   display:inline-block;
   line-height:0;
-">
-  <img
-    src="${imageBase64}"
-    style="
-      width:auto;
-      height:auto;
-      max-width:280px;
-      max-height:350px;
-      border-radius:12px;
-      object-fit:contain;
-      display:block;
-    "
-  >
+ ">
+ <img
+   src="${imageBase64}"
+   style="
+     width:auto;
+     height:auto;
+     max-width:280px;
+     max-height:350px;
+     border-radius:12px;
+     object-fit:contain;
+     display:block;
+   "
+ >
 </div>  
         >
       </div>
@@ -292,8 +292,8 @@ if (image) {
   responseDiv.scrollTop =
     responseDiv.scrollHeight;
   // ================================
-// PART 3 — API + AI REPLY
-// ================================
+ // PART 3 — API + AI REPLY
+ // ================================
 
   try {
 
@@ -375,7 +375,7 @@ if (image) {
           class="speak-btn"
           onclick="speakReply(this)"
           data-text="${cleanReply
-            .replace(/"/g, "&quot;")}"
+            .replace(/\"/g, "&quot;")}" 
         >
           🔊
         </button>
@@ -477,6 +477,14 @@ if ("webkitSpeechRecognition" in window) {
       "click",
       () => {
 
+        // If AI is speaking, stop it so user can start speaking immediately
+        if (speechSynthesis.speaking) {
+          speechSynthesis.cancel();
+          // clear live flags as well
+          if (typeof liveSpeaking !== 'undefined') liveSpeaking = false;
+          if (typeof liveProcessing !== 'undefined') liveProcessing = false;
+        }
+
         recognition.start();
 
       }
@@ -506,6 +514,20 @@ if ("webkitSpeechRecognition" in window) {
 
     };
 
+  // If the user starts speaking while AI is speaking, stop AI immediately
+  recognition.onspeechstart = () => {
+    if (speechSynthesis.speaking) {
+      console.log('User started speaking: cancelling AI speech');
+      speechSynthesis.cancel();
+      if (typeof liveSpeaking !== 'undefined') liveSpeaking = false;
+      if (typeof liveProcessing !== 'undefined') liveProcessing = false;
+    }
+  };
+
+  recognition.onend = () => {
+    // nothing special for single-shot recognition
+  };
+
 } else {
 
   if (micBtn) {
@@ -530,6 +552,9 @@ function speakReply(button) {
 
   if (!text) return;
 
+
+  // Stop any live recognition before speaking
+  try { stopLiveListening(); } catch (e) {}
 
   speechSynthesis.cancel();
 
@@ -603,7 +628,7 @@ if (imageInput) {
       "
     >×</button>
   </div>
-`;
+ `;
 
 removeImageBtn.hidden = false;
 
@@ -614,6 +639,7 @@ actionBtn.innerHTML = "↑";
   false;
 
 actionBtn.innerHTML = "↑";
+
 
 } else {
 
@@ -1295,6 +1321,16 @@ function stopLiveListening() {
 }
 if (liveRecognition) {
 
+  liveRecognition.onspeechstart = () => {
+    // If AI is speaking and user starts speaking, immediately stop AI and continue listening
+    if (liveSpeaking || speechSynthesis.speaking) {
+      console.log('User started speaking during AI speech: cancelling AI');
+      speechSynthesis.cancel();
+      liveSpeaking = false;
+      // keep liveRecognition running — no need to stop
+    }
+  };
+
   liveRecognition.onresult = async (event) => {
 
     if (!liveMode) return;
@@ -1324,8 +1360,10 @@ if (liveRecognition) {
 
     console.log("🎤 You:", finalText);
 
-    // AI को अपना ही जवाब दोबारा सुनने से रोकना
-    if (liveSpeaking) return;
+    // If AI was speaking, we've already cancelled it in onspeechstart handler above.
+    if (liveSpeaking) {
+      liveSpeaking = false;
+    }
 
     if (liveProcessing) return;
 
@@ -1359,6 +1397,25 @@ if (liveRecognition) {
 
     liveProcessing = false;
 
+  };
+
+  liveRecognition.onerror = (event) => {
+    console.warn('Live recognition error', event.error);
+    // If recognition stops unexpectedly while liveMode is on, try restarting after a short backoff
+    if (liveMode && !liveSpeaking && !liveProcessing) {
+      setTimeout(() => {
+        startLiveListening();
+      }, 500);
+    }
+  };
+
+  liveRecognition.onend = () => {
+    // If the recognition ends unexpectedly but liveMode is still on, restart it
+    if (liveMode && !liveSpeaking && !liveProcessing) {
+      setTimeout(() => {
+        try { startLiveListening(); } catch(e) {}
+      }, 300);
+    }
   };
 
 }
@@ -1401,6 +1458,9 @@ function speakLiveReply() {
     startLiveListening();
     return;
   }
+
+  // Stop any ongoing recognition so the AI voice isn't captured
+  try { stopLiveListening(); } catch (e) {}
 
   speechSynthesis.cancel();
 
