@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "node tests/run_tests.js"
+  },
   "dependencies": {
     "@google/genai": "^1.15.0"
   }
