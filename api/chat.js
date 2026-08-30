@@ -192,7 +192,7 @@ export default async function handler(req, res) {
     }
 
     // No provider keys configured — return a safe canned reply (non-placeholder but functional)
-    return res.status(200).json({ reply: 'Kailash AI (local mode): मुझे अभी कोई external AI key नहीं मिली। आप GEMINI_API_KEY या OPENAI_API_KEY सेट कर सकते हैं, या USE_MOCK_GEMINI=1 के साथ लोकल mock चलाएँ।' });
+    return res.status(200).json({ reply: 'Kailash AI (local mode): मुझे अभी कोई external AI key नहीं मिली। आप GEMINI_API_KEY या OPENAI_API_KEY सेट करके external AI प्रयोग कर सकते हैं। अभी के लिए मैं local मोड में हूँ और मैं सामान्य जानकारी, लिंक सुझाव और संक्षेप प्रदान कर सकता हूँ।' });
   } catch (error) {
     console.error('ERROR in /api/chat:', error);
     if (error.code === 'TIMEOUT') {
