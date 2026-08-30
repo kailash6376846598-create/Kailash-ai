@@ -1,9 +1,9 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ reply: "Method not allowed" });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ reply: 'Method not allowed' });
   }
 
-  const { prompt, chatHistory = [], imageBase64, hasImage, pdfText } = req.body;
+  const { prompt, chatHistory = [], imageBase64, hasImage, pdfText } = req.body || {};
 
   // Provider keys (kept only in env; no secrets in code)
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -16,18 +16,23 @@ export default async function handler(req, res) {
   const MAX_FETCH_RETRIES = Number(process.env.MAX_FETCH_RETRIES) || 3;
   const MAX_IMAGE_BYTES = Number(process.env.MAX_IMAGE_BYTES) || 2_500_000; // ~2.5MB
 
-  // Basic logging
   try {
+    // Basic logging
     const approxSize = JSON.stringify({ prompt, chatHistory }).length;
-    console.log(`Incoming request: promptLen=${prompt?.length || 0}, historyEntries=${chatHistory.length}, approxPayloadChars=${approxSize}`);
+    console.log(`Incoming /api/chat: promptLen=${prompt?.length || 0}, historyEntries=${(chatHistory || []).length}, approxPayloadChars=${approxSize}`);
   } catch (e) {}
+
+  // Input validation
+  if (!prompt && !pdfText && !hasImage) {
+    return res.status(400).json({ reply: 'No prompt provided' });
+  }
 
   // Validate image size (if provided)
   if (imageBase64) {
     const b64 = (imageBase64.split(',')[1] || '');
     const approxBytes = Math.ceil(b64.length * 3 / 4);
     if (approxBytes > MAX_IMAGE_BYTES) {
-      return res.status(413).json({ reply: "Image too large. Please use a smaller image." });
+      return res.status(413).json({ reply: 'Image too large. Please use a smaller image.' });
     }
   }
 
@@ -44,15 +49,12 @@ export default async function handler(req, res) {
   // Build a single user prompt including PDF/image hints
   let userPrompt = '';
   if (safePdfText) {
-    userPrompt += `PDF Content:\n${safePdfText}\n\nUser Question:\n${prompt}`;
+    userPrompt += `PDF Content:\n${safePdfText}\n\nUser Question:\n${prompt || ''}`;
   } else {
     userPrompt = prompt || '';
   }
 
-  // If image included, append a short hint (we don't forward binary to all providers)
-  if (hasImage && imageBase64) {
-    userPrompt += '\n\n[User attached an image]';
-  }
+  if (hasImage && imageBase64) userPrompt += '\n\n[User attached an image]';
 
   // Helper: fetch with timeout + retries for 429
   async function fetchWithTimeoutAndRetries(url, options) {
@@ -100,11 +102,12 @@ export default async function handler(req, res) {
   try {
     // Provider selection priority: Gemini -> OpenAI -> Mock -> Safe canned
     if (GEMINI_API_KEY) {
-      const url = `https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
+      // Use Authorization header for Gemini key (more secure than query param)
+      const url = `https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent`;
 
       const requestBody = {
         systemInstruction: {
-          parts: [{ text: 'तुम एक मददगार हिंदी AI असिस्टेंट हो। सरल भाषा में जवाब दो।' }]
+          parts: [{ text: 'तुम एक मददगार हिंदी AI असिस्टेंट हो। सरल भाषा में, विनम्र और संक्षिप्त उत्तर दो।' }]
         },
         contents: [
           ...shortHistory.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }] })),
@@ -114,7 +117,7 @@ export default async function handler(req, res) {
 
       const response = await fetchWithTimeoutAndRetries(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${GEMINI_API_KEY}` },
         body: JSON.stringify(requestBody)
       });
 
@@ -126,20 +129,20 @@ export default async function handler(req, res) {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
+        console.warn('Gemini error', response.status, data);
         return res.status(response.status).json({ reply: data.error?.message || 'AI से जवाब प्राप्त नहीं हो सका।' });
       }
 
       const data = await response.json();
-      console.log('Google Response:', data?.candidates?.[0]);
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'मुझे अभी कोई जवाब नहीं मिला।';
-      return res.status(200).json({ reply });
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.candidates?.[0]?.output || 'मुझे अभी कोई उत्तर नहीं मिला।';
+      return res.status(200).json({ reply, provider: 'gemini', raw: data });
     }
 
     if (OPENAI_API_KEY) {
       // Use OpenAI Chat Completions as fallback
       const url = 'https://api.openai.com/v1/chat/completions';
       const messages = [
-        { role: 'system', content: 'You are Kailash AI: helpful assistant that answers in Hindi when user uses Hindi.' },
+        { role: 'system', content: 'You are Kailash AI: helpful assistant that prefers Hindi responses. Keep answers concise and friendly.' },
         ...shortHistory.map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.text })),
         { role: 'user', content: userPrompt }
       ];
@@ -162,12 +165,13 @@ export default async function handler(req, res) {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
+        console.warn('OpenAI error', response.status, data);
         return res.status(response.status).json({ reply: data.error?.message || 'AI से जवाब प्राप्त नहीं हो सका।' });
       }
 
       const data = await response.json();
       const reply = data.choices?.[0]?.message?.content || 'मुझे अभी कोई उत्तर नहीं मिला।';
-      return res.status(200).json({ reply });
+      return res.status(200).json({ reply, provider: 'openai', raw: data });
     }
 
     if (USE_MOCK) {
@@ -181,18 +185,18 @@ export default async function handler(req, res) {
         });
         if (response.ok) {
           const d = await response.json().catch(() => ({}));
-          const reply = d.candidates?.[0]?.content?.parts?.[0]?.text || 'Mock reply';
-          return res.status(200).json({ reply });
+          const reply = d.candidates?.[0]?.content?.parts?.[0]?.text || d.reply || 'Mock reply';
+          return res.status(200).json({ reply, provider: 'mock', raw: d });
         }
       } catch (e) {
         console.warn('Mock forward failed', e?.message || e);
       }
 
-      return res.status(200).json({ reply: 'यह स्थानीय mock उत्तर है — कृपया GEMINI_API_KEY या OPENAI_API_KEY सेट करें।' });
+      return res.status(200).json({ reply: 'यह स्थानीय mock उत्तर है — कृपया GEMINI_API_KEY या OPENAI_API_KEY सेट करें।', provider: 'mock' });
     }
 
-    // No provider keys configured — return a safe canned reply (non-placeholder but functional)
-    return res.status(200).json({ reply: 'Kailash AI (local mode): मुझे अभी कोई external AI key नहीं मिली। आप GEMINI_API_KEY या OPENAI_API_KEY सेट कर सकते हैं, या USE_MOCK_GEMINI=1 के साथ लोकल mock चलाएँ।' });
+    // No provider keys configured — return a safe canned reply with guidance
+    return res.status(200).json({ reply: 'Kailash AI (local mode): कोई external AI key सेट नहीं है। चालू करने के लिए GEMINI_API_KEY या OPENAI_API_KEY environment variables जोड़ें.' });
   } catch (error) {
     console.error('ERROR in /api/chat:', error);
     if (error.code === 'TIMEOUT') {
