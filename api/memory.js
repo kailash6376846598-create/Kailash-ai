@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
-
 const DATA_PATH = path.join(process.cwd(), 'data', 'memory.json');
+const TMP_SUFFIX = '.tmp';
 
 async function load() {
   try {
@@ -14,7 +14,14 @@ async function load() {
 
 async function save(obj) {
   await fs.mkdir(path.dirname(DATA_PATH), { recursive: true });
-  await fs.writeFile(DATA_PATH, JSON.stringify(obj, null, 2), 'utf8');
+  const tmp = DATA_PATH + TMP_SUFFIX;
+  await fs.writeFile(tmp, JSON.stringify(obj, null, 2), 'utf8');
+  // atomic rename
+  await fs.rename(tmp, DATA_PATH).catch(async (err) => {
+    // fallback: try direct write
+    console.warn('atomic rename failed, falling back to writeFile', err && err.message ? err.message : err);
+    await fs.writeFile(DATA_PATH, JSON.stringify(obj, null, 2), 'utf8');
+  });
 }
 
 export default async function handler(req, res) {
