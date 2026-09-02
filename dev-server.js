@@ -3,15 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
-// Import handlers
-import chatHandler from './api/chat.js';
-import memoryHandler from './api/memory.js';
-import uploadHandler from './api/upload.js';
-import searchHandler from './api/search.js';
-import toolCalcHandler from './api/tool-calc.js';
-import schedulerHandler from './api/scheduler.js';
-import youtubeHandler from './api/youtube.js';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -66,16 +57,65 @@ app.use(express.static(path.join(__dirname)));
 // JSON body parser with generous limit (but respect server-side guards)
 app.use(express.json({ limit: '20mb' }));
 
-// Mount the handlers
-app.post('/api/chat', async (req, res) => {
-  try { await chatHandler(req, res); } catch (err) { console.error('chat handler error', err); res.status(500).json({ reply: 'Server error' }); }
+// Dynamic handler loader: attempt to import optional handlers (non-fatal)
+async function tryLoadHandler(relPath) {
+  try {
+    const mod = await import(`./${relPath}`);
+    return mod && mod.default ? mod.default : null;
+  } catch (e) {
+    // Module not found or error — return null, but log for diagnostics
+    if (e && e.code !== 'ERR_MODULE_NOT_FOUND') console.warn(`Failed loading ${relPath}:`, e && e.message ? e.message : e);
+    return null;
+  }
+}
+
+// Load handlers (top-level await is allowed in ESM with package.json "type": "module")
+const handlers = {
+  chat: await tryLoadHandler('api/chat.js'),
+  memory: await tryLoadHandler('api/memory.js'),
+  upload: await tryLoadHandler('api/upload.js'),
+  search: await tryLoadHandler('api/search.js'),
+  toolCalc: await tryLoadHandler('api/tool-calc.js'),
+  scheduler: await tryLoadHandler('api/scheduler.js'),
+  youtube: await tryLoadHandler('api/youtube.js'),
+  tts: await tryLoadHandler('api/tts-mock.js'),
+};
+
+// Helper to mount or fallback
+function mountPost(pathUrl, handler, name) {
+  if (handler) {
+    app.post(pathUrl, async (req, res) => {
+      try { await handler(req, res); } catch (err) { console.error(`${name} handler error`, err); res.status(500).json({ error: 'Server error' }); }
+    });
+  } else {
+    app.post(pathUrl, (req, res) => res.status(501).json({ error: `${pathUrl} not implemented in this build` }));
+  }
+}
+
+// Mount the handlers (preserve behavior for chat and memory)
+if (handlers.chat) {
+  app.post('/api/chat', async (req, res) => { try { await handlers.chat(req, res); } catch (err) { console.error('chat handler error', err); res.status(500).json({ reply: 'Server error' }); } });
+} else {
+  mountPost('/api/chat', null, 'chat');
+}
+
+if (handlers.memory) {
+  app.all('/api/memory', async (req, res) => { try { await handlers.memory(req, res); } catch (err) { console.error('memory handler error', err); res.status(500).json({ error: 'Server error' }); } });
+} else {
+  app.all('/api/memory', (req, res) => res.status(501).json({ error: 'memory not implemented' }));
+}
+
+mountPost('/api/upload', handlers.upload, 'upload');
+mountPost('/api/search', handlers.search, 'search');
+mountPost('/api/tool/calc', handlers.toolCalc, 'tool-calc');
+
+app.all('/api/scheduler', async (req, res) => {
+  if (handlers.scheduler) { try { await handlers.scheduler(req, res); } catch (err) { console.error('scheduler handler error', err); res.status(500).json({ error: 'Server error' }); } }
+  else res.status(501).json({ error: 'scheduler not implemented' });
 });
-app.all('/api/memory', async (req, res) => { try { await memoryHandler(req, res); } catch (err) { console.error('memory handler error', err); res.status(500).json({ error: 'Server error' }); } });
-app.post('/api/upload', async (req, res) => { try { await uploadHandler(req, res); } catch (err) { console.error('upload handler error', err); res.status(500).json({ error: 'Server error' }); } });
-app.post('/api/search', async (req, res) => { try { await searchHandler(req, res); } catch (err) { console.error('search handler error', err); res.status(500).json({ error: 'Server error' }); } });
-app.post('/api/tool/calc', async (req, res) => { try { await toolCalcHandler(req, res); } catch (err) { console.error('tool-calc handler error', err); res.status(500).json({ error: 'Server error' }); } });
-app.all('/api/scheduler', async (req, res) => { try { await schedulerHandler(req, res); } catch (err) { console.error('scheduler handler error', err); res.status(500).json({ error: 'Server error' }); } });
-app.post('/api/youtube', async (req, res) => { try { await youtubeHandler(req, res); } catch (err) { console.error('youtube handler error', err); res.status(500).json({ error: 'Server error' }); } });
+
+mountPost('/api/youtube', handlers.youtube, 'youtube');
+mountPost('/api/tts', handlers.tts, 'tts-mock');
 
 // Health
 app.get('/_health', (req, res) => res.json({ ok: true }));
